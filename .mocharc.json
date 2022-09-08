@@ -1,0 +1,11 @@
+{
+    "require": "hardhat/register",
+    "timeout": 40000,
+    "_": [
+        "test/**/*.ts"
+    ],
+    "DEV-COMMENTS": {
+        "warning": "Running test directly from Visual Studio Code won't compile your contracts automatically. Make sure compile them manually.",
+        "source": "https://hardhat.org/hardhat-runner/docs/advanced/vscode-tests"
+    }
+}

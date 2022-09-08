@@ -1,0 +1,75 @@
+{
+  "name": "@defifofum/hardhat-template",
+  "version": "0.0.2",
+  "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "yarn audit && yarn compile && yarn lint:sol && yarn clean ./dist",
+    "build": "tsc",
+    "precompile": "yarn clean ./artifacts",
+    "compile": "hardhat compile",
+    "gen:docs": "hardhat docgen",
+    "test": "hardhat test",
+    "test:gas": "env REPORT_GAS=true yarn test",
+    "test:coverage": "hardhat coverage",
+    "test:ci": "yarn test",
+    "lint": "yarn lint:sol",
+    "lint:fix": "yarn lint:sol:fix",
+    "lint:sol": "solhint 'contracts/**/*.sol' && prettier --check 'contracts/**/*.sol'",
+    "lint:sol:fix": "prettier --write 'contracts/**/*.sol'",
+    "lint:ci": "yarn lint",
+    "list:networks": "hardhat verify --list-networks",
+    "clean": "node ./hardhat/utils/clean.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeFiFoFum/hardhat-template.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DeFiFoFum/hardhat-template/issues"
+  },
+  "homepage": "https://github.com/DeFiFoFum/hardhat-template#readme",
+  "resolutions": {
+    "got": "^11.8.5",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "@ethersproject/abi": "^5.4.7",
+    "@ethersproject/providers": "^5.4.7",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^1.0.1",
+    "@nomiclabs/hardhat-ethers": "^2.0.0",
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
+    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/hardhat": "^6.1.2",
+    "@types/chai": "^4.2.0",
+    "@types/mocha": "^9.1.0",
+    "@types/node": ">=12.0.0",
+    "@types/node-fetch": "^2.6.2",
+    "chai": "^4.2.0",
+    "chalk": "4.1.1",
+    "dotenv": "^16.0.1",
+    "ethers": "^5.4.7",
+    "fs": "^0.0.1-security",
+    "hardhat": "^2.10.1",
+    "hardhat-docgen": "^1.3.0",
+    "hardhat-gas-reporter": "^1.0.8",
+    "node-fetch": "2.6.7",
+    "prettier": "^2.7.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.24",
+    "solhint": "^3.3.7",
+    "solhint-plugin-prettier": "^0.0.5",
+    "solidity-coverage": "^0.7.21",
+    "ts-node": ">=8.0.0",
+    "typechain": "^8.1.0",
+    "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts-upgradeable": "^4.7.3"
+  }
+}
