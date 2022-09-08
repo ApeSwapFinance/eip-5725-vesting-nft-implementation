@@ -1,7 +1,7 @@
 /**
  * Set the Solidity compiler version
  */
-const COMPILER_VERSION = "0.8.16"
+const COMPILER_VERSION = "0.8.17"
 
 /**
  * 
