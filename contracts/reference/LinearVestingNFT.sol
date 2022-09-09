@@ -25,7 +25,7 @@ contract LinearVestingNFT is BaseVestingNFT {
 
     /**
      * @notice Creates a new vesting NFT and mints it
-     * @dev Token amount should be approved to be transfered by this contract before executing create
+     * @dev Token amount should be approved to be transferred by this contract before executing create
      * @param to The recipient of the NFT
      * @param amount The total assets to be locked over time
      * @param startTime When the vesting starts in epoch timestamp

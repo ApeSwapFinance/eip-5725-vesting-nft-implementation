@@ -1,5 +1,5 @@
 {
-  "name": "@defifofum/hardhat-template",
+  "name": "@ApeSwapFinance/erc5627-vesting-nft",
   "version": "0.0.2",
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
   "main": "index.js",
@@ -23,15 +23,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/DeFiFoFum/hardhat-template.git"
+    "url": "git+https://github.com/ApeSwapFinance/erc5627-vesting-nft.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/DeFiFoFum/hardhat-template/issues"
+    "url": "https://github.com/ApeSwapFinance/erc5627-vesting-nft/issues"
   },
-  "homepage": "https://github.com/DeFiFoFum/hardhat-template#readme",
+  "homepage": "https://github.com/ApeSwapFinance/erc5627-vesting-nft#readme",
   "resolutions": {
     "got": "^11.8.5",
     "node-fetch": "^2.6.7"

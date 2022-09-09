@@ -1,11 +1,5 @@
-# Hardhat Template - _by [DeFiFoFum](https://github.com/defifofum)_ <img src="https://avatars.githubusercontent.com/u/78645267?v=4" alt="DeFiFoFum Avatar" width="25px"> 
-<!-- 
-  FIXME: Update `DeFiFoFum/hardhat-template` based on current repo 
-  1. Find All (CMD/CTRL + SHIFT + F)
-  2. Search for: DeFiFoFum/hardhat-template
-  3. Replace with <user>/<your-repo>
-  -->
-[![lint & test](https://github.com/DeFiFoFum/hardhat-template/actions/workflows/lint-test.yml/badge.svg)](https://github.com/DeFiFoFum/hardhat-template/actions/workflows/lint-test.yml)
+# ERC5627: Transferrable Vesting NFT - Reference Implementation
+[![lint & test](https://github.com/ApeSwapFinance/erc5627-vesting-nft/actions/workflows/lint-test.yml/badge.svg)](https://github.com/ApeSwapFinance/erc5627-vesting-nft/actions/workflows/lint-test.yml)
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -48,10 +42,10 @@ This project uses special tasks, adapted from Balancer protocol, to deploy and v
 - Create a deployment task (See the [template-readme](./tasks/20xxxxxx-template/readme.md) on creating a new task), then deploy/verify following the commands below
 
 ## Deployment 
-`npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`  
+Deploy Implementation to Ethereum mainnet  
+`npx hardhat deploy --id 20220908-vesting-nft --network mainnet`   
 
-This will deploy the example task to `bscTestnet`:  
-eg: `npx hardhat deploy --id 20220816-deploy-lock --network bscTestnet`  
+`npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`  
 
 ## Verification
 `npx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name> [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`  
