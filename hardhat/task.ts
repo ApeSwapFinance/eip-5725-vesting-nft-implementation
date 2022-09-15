@@ -50,11 +50,10 @@ export default class Task {
   }
 
   static printAllTask() {
-    const taskNames = this.getAllTasks();
+    const taskNames = this.getAllTasks()
     logger.log(`Available Tasks:`, `🚀`)
     for (const taskName of taskNames) {
       logger.log(`${taskName}`, `➡️`)
-
     }
   }
 
