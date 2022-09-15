@@ -14,7 +14,7 @@
     "test": "hardhat test",
     "test:gas": "env REPORT_GAS=true yarn test",
     "test:coverage": "hardhat coverage",
-    "test:ci": "yarn test",
+    "test:ci": "yarn compile && yarn test",
     "lint": "yarn lint:sol && yarn lint:ts",
     "lint:fix": "yarn lint:sol:fix && yarn lint:ts:fix",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier --check 'contracts/**/*.sol'",
