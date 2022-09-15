@@ -8,15 +8,18 @@ import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
 import { HardhatRuntimeEnvironment, NetworkUserConfig } from 'hardhat/types'
 
 import { Task, Verifier, Network } from './hardhat'
-import { getEnv, Logger, testRunner } from './hardhat/utils'
-import solhintConfig from "./solhint.config"
+import { getEnv, Logger, logger, testRunner } from './hardhat/utils'
+import solhintConfig from './solhint.config'
 
 /**
  * Deploy contracts based on a directory ID in tasks/
- * 
+ *
  * `npx hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]`
  */
-task('deploy', 'Run deployment task')
+task(
+  'deploy',
+  'hardhat deploy --id <task-id> --network <network-name> [--key <apiKey> --force --verbose]'
+)
   .addParam('id', 'Deployment task ID')
   .addFlag('force', 'Ignore previous deployments')
   .addOptionalParam('key', 'Etherscan API key to verify contracts')
@@ -26,21 +29,22 @@ task('deploy', 'Run deployment task')
       hre: HardhatRuntimeEnvironment
     ) => {
       Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Network, args.key);
-      const verifier = key
-        ? new Verifier(hre.network, key)
-        : undefined
+      const key = parseApiKey(hre.network.name as Network, args.key)
+      const verifier = key ? new Verifier(hre.network, key) : undefined
       await Task.fromHRE(args.id, hre, verifier).run(args)
     }
   )
 
 /**
  * Verify contracts based on a directory ID in tasks/
- * 
+ *
  * eg: `npx hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name>
  *  [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]`
  */
-task('verify-contract', 'Run verification for a given contract')
+task(
+  'verify-contract',
+  'hardhat verify-contract --id <task-id> --network <network-name> --name <contract-name> [--address <contract-address> --args <constructor-args --key <apiKey> --force --verbose]'
+)
   .addParam('id', 'Deployment task ID')
   .addParam('name', 'Contract name')
   .addOptionalParam('address', 'Contract address')
@@ -59,10 +63,8 @@ task('verify-contract', 'Run verification for a given contract')
       hre: HardhatRuntimeEnvironment
     ) => {
       Logger.setDefaults(false, args.verbose || false)
-      const key = parseApiKey(hre.network.name as Network, args.key);
-      const verifier = key
-        ? new Verifier(hre.network, key)
-        : undefined
+      const key = parseApiKey(hre.network.name as Network, args.key)
+      const verifier = key ? new Verifier(hre.network, key) : undefined
 
       await Task.fromHRE(args.id, hre, verifier).verify(
         args.name,
@@ -72,9 +74,16 @@ task('verify-contract', 'Run verification for a given contract')
     }
   )
 
+task('print-tasks', 'Prints deployment tasks in tasks/').setAction(
+  async (args: { verbose?: boolean }) => {
+    Logger.setDefaults(false, args.verbose || false)
+    Task.printAllTask()
+  }
+)
+
 /**
  * Provide additional fork testing options
- * 
+ *
  * eg: `npx hardhat test --fork <network-name> --blockNumber <block-number>`
  */
 task(TASK_TEST)
@@ -127,7 +136,8 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
     },
   },
   polygon: {
-    url: getEnv('POLYGON_RPC_URL') || 'https://matic-mainnet.chainstacklabs.com',
+    url:
+      getEnv('POLYGON_RPC_URL') || 'https://matic-mainnet.chainstacklabs.com',
     chainId: 137,
     accounts: {
       mnemonic: mainnetMnemonic,
@@ -135,7 +145,7 @@ const networkConfig: Record<Network, NetworkUserConfig> = {
   },
   polygonTestnet: {
     url:
-    getEnv('POLYGON_TESTNET_RPC_URL') || 'https://rpc-mumbai.maticvigil.com/',
+      getEnv('POLYGON_TESTNET_RPC_URL') || 'https://rpc-mumbai.maticvigil.com/',
     chainId: 80001,
     accounts: {
       mnemonic: testnetMnemonic,
@@ -159,8 +169,8 @@ const config: HardhatUserConfig = {
     // More options can be found here:
     // https://www.npmjs.com/package/hardhat-gas-reporter
     enabled: getEnv('REPORT_GAS') ? true : false,
-    currency: "USD",
-    excludeContracts: []
+    currency: 'USD',
+    excludeContracts: [],
   },
   docgen: {
     path: './docs',
@@ -172,7 +182,7 @@ const config: HardhatUserConfig = {
     target: 'ethers-v5',
     // externalArtifacts: [], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
     alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
-    dontOverrideCompile: false // defaults to false
+    dontOverrideCompile: false, // defaults to false
   },
   etherscan: {
     /**
@@ -198,7 +208,7 @@ const parseApiKey = (network: Network, key?: string): string | undefined => {
 /**
  * Placeholder configuration for @nomiclabs/hardhat-etherscan to store verification API urls
  */
-const verificationConfig: {etherscan: { apiKey: Record<Network, string>}} = {
+const verificationConfig: { etherscan: { apiKey: Record<Network, string> } } = {
   etherscan: {
     apiKey: {
       hardhat: 'NO_API_KEY',
@@ -208,8 +218,8 @@ const verificationConfig: {etherscan: { apiKey: Record<Network, string>}} = {
       bscTestnet: getEnv('BSCSCAN_API_KEY'),
       polygon: getEnv('POLYGONSCAN_API_KEY'),
       polygonTestnet: getEnv('POLYGONSCAN_API_KEY'),
-    }
-  }
+    },
+  },
 }
 
 export default config
