@@ -27,15 +27,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ApeSwapFinance/erc5627-vesting-nft.git"
+    "url": "git+https://github.com/ApeSwapFinance/ercXXXX-vesting-nft.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/ApeSwapFinance/erc5627-vesting-nft/issues"
+    "url": "https://github.com/ApeSwapFinance/ercXXXX-vesting-nft/issues"
   },
-  "homepage": "https://github.com/ApeSwapFinance/erc5627-vesting-nft#readme",
+  "homepage": "https://github.com/ApeSwapFinance/ercXXXX-vesting-nft#readme",
   "resolutions": {
     "got": "^11.8.5",
     "node-fetch": "^2.6.7"

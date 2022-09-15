@@ -23,8 +23,10 @@ interface IVestingNFT is IERC721 {
     function claim(uint256 tokenId) external returns (uint256 amountClaimed);
 
     /**
-     * @notice Total amount of tokens which have been vested at the current timestamp. This number also includes vested tokens which have been claimed.
-     * @dev It is RECOMMENDED that this function call `vestedPayoutAtTime` with `block.timestamp` as the `timestamp` parameter.
+     * @notice Total amount of tokens which have been vested at the current timestamp.
+     *   This number also includes vested tokens which have been claimed.
+     * @dev It is RECOMMENDED that this function call `vestedPayoutAtTime` with `block.timestamp`
+     *   as the `timestamp` parameter.
      * @param tokenId The NFT token id
      * @return payout Total amount of tokens which have been vested at the current timestamp.
      */

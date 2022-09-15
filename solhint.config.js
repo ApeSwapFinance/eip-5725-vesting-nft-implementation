@@ -32,7 +32,7 @@ module.exports = {
     "ordering": "error",
 
     // Security Rules
-    "compiler-version": ["error", COMPILER_VERSION],
+    "compiler-version": ["warn", COMPILER_VERSION],
     "avoid-sha3": "error",
     "avoid-suicide": "error",
     "avoid-throw": "error",
