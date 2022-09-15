@@ -4,16 +4,16 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @title Non-Fungible Vesting Token Standard
- * @notice A non-fungible token standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve 
+ * @notice A non-fungible token standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve
  *  scheduled using timestamps.
- * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the 
+ * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
  */
 interface IVestingNFT is IERC721 {
     event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 _claimAmount);
 
-    /** 
-     * @notice Claim the pending payout for the NFT 
+    /**
+     * @notice Claim the pending payout for the NFT
      * @dev MUST grant the claimablePayout value at the time of claim being called
      * MUST revert if not called by the token owner or approved users
      * SHOULD revert if there is nothing to claim
@@ -43,7 +43,7 @@ interface IVestingNFT is IERC721 {
     /**
      * @notice Number of tokens for a NFT which are currently vesting or locked
      * @param tokenId The NFT token id
-     * @return payout The number of tokens for the NFT which have not been claimed yet 
+     * @return payout The number of tokens for the NFT which have not been claimed yet
      */
     function vestingPayout(uint256 tokenId) external view returns (uint256 payout);
 
@@ -52,14 +52,14 @@ interface IVestingNFT is IERC721 {
      * @dev It is RECOMMENDED that this is calculated as the `vestedPayout()` value with the total
      * amount of tokens claimed subtracted.
      * @param tokenId The NFT token id
-     * @return payout The number of tokens for the NFT which have not been claimed yet 
+     * @return payout The number of tokens for the NFT which have not been claimed yet
      */
     function claimablePayout(uint256 tokenId) external view returns (uint256 payout);
 
     /**
      * @notice The start and end timestamps for the vesting of the provided NFT
      * @dev MUST return the mint timestamp as the `vestingStart`
-     * MUST return the timestamp where no further increase in vestedPayout occurs for `vestingEnd`. 
+     * MUST return the timestamp where no further increase in vestedPayout occurs for `vestingEnd`.
      * @param tokenId The NFT token id
      * @return vestingStart The beginning of the vesting as a unix timestamp
      * @return vestingEnd The ending of the vesting as a unix timestamp
@@ -68,7 +68,7 @@ interface IVestingNFT is IERC721 {
 
     /**
      * @notice Token which is used to pay out the vesting claims
-     * @param tokenId The NFT token id 
+     * @param tokenId The NFT token id
      * @return token The token which is used to pay out the vesting claims
      */
     function payoutToken(uint256 tokenId) external view returns (address token);

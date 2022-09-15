@@ -7,14 +7,14 @@ contract LinearVestingNFT is BaseVestingNFT {
     using SafeERC20 for IERC20;
 
     struct VestDetails {
-        IERC20 payoutToken; /// @dev payout token 
+        IERC20 payoutToken; /// @dev payout token
         uint256 payout; /// @dev payout token remaining to be paid
         uint128 startTime; /// @dev when vesting starts
         uint128 endTime; /// @dev when vesting end
         uint128 cliff; /// @dev duration in seconds of the cliff in which tokens will be begin releasing
     }
     mapping(uint256 => VestDetails) public vestDetails; /// @dev maps the vesting data with tokenIds
-    
+
     /// @dev tracker of current NFT id
     uint256 private _tokenIdTracker;
 
@@ -33,7 +33,14 @@ contract LinearVestingNFT is BaseVestingNFT {
      * @param cliff The cliff duration in seconds
      * @param token The ERC20 token to vest over time
      */
-    function create(address to, uint256 amount, uint128 startTime, uint128 duration, uint128 cliff, IERC20 token) public virtual  {
+    function create(
+        address to,
+        uint256 amount,
+        uint128 startTime,
+        uint128 duration,
+        uint128 cliff,
+        IERC20 token
+    ) public virtual {
         require(startTime >= block.timestamp, "startTime cannot be on the past");
         require(to != address(0), "to cannot be address 0");
         require(cliff <= duration, "duration needs to be more than cliff");
@@ -56,41 +63,47 @@ contract LinearVestingNFT is BaseVestingNFT {
     /**
      * @dev See {IVestingNFT}.
      */
-    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp) public view override(BaseVestingNFT) validToken(tokenId)returns (uint256 payout){
+    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
+        public
+        view
+        override(BaseVestingNFT)
+        validToken(tokenId)
+        returns (uint256 payout)
+    {
         if (timestamp < _cliff(tokenId)) {
             return 0;
         }
         if (timestamp > _endTime(tokenId)) {
             return _payout(tokenId);
         }
-        return _payout(tokenId) * (timestamp -  _startTime(tokenId)) / (_endTime(tokenId) - _startTime(tokenId));
+        return (_payout(tokenId) * (timestamp - _startTime(tokenId))) / (_endTime(tokenId) - _startTime(tokenId));
     }
 
     /**
      * @dev See {BaseVestingNFT}.
      */
-    function _payoutToken(uint256 tokenId) internal view override returns(address) {
+    function _payoutToken(uint256 tokenId) internal view override returns (address) {
         return address(vestDetails[tokenId].payoutToken);
     }
 
     /**
      * @dev See {BaseVestingNFT}.
      */
-    function _payout(uint256 tokenId) internal view override returns(uint256) {
+    function _payout(uint256 tokenId) internal view override returns (uint256) {
         return vestDetails[tokenId].payout;
     }
 
     /**
      * @dev See {BaseVestingNFT}.
      */
-    function _startTime(uint256 tokenId) internal view override returns(uint256) {
+    function _startTime(uint256 tokenId) internal view override returns (uint256) {
         return vestDetails[tokenId].startTime;
     }
 
     /**
      * @dev See {BaseVestingNFT}.
      */
-    function _endTime(uint256 tokenId) internal view override returns(uint256) {
+    function _endTime(uint256 tokenId) internal view override returns (uint256) {
         return vestDetails[tokenId].endTime;
     }
 
@@ -100,7 +113,7 @@ contract LinearVestingNFT is BaseVestingNFT {
      * @param tokenId on to check
      * @return uint256 the cliff time in seconds
      */
-    function _cliff(uint256 tokenId) internal view returns(uint256) {
+    function _cliff(uint256 tokenId) internal view returns (uint256) {
         return vestDetails[tokenId].cliff;
     }
 }

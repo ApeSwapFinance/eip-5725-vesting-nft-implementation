@@ -11,11 +11,12 @@ import "./IVestingNFT.sol";
 abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     using SafeERC20 for IERC20;
 
-    /// @dev mapping for claimed payouts 
-    mapping(uint256 /*tokenId*/ => uint256 /*claimed*/) internal _payoutClaimed;
+    /// @dev mapping for claimed payouts
+    mapping(uint256 => uint256) /*tokenId*/ /*claimed*/
+        internal _payoutClaimed;
 
-    /** 
-     * @notice Checks if the tokenId exists and its valid 
+    /**
+     * @notice Checks if the tokenId exists and its valid
      * @param tokenId The NFT token id
      */
     modifier validToken(uint256 tokenId) {
@@ -30,9 +31,9 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
         require(ownerOf(tokenId) == msg.sender, "Not owner of NFT");
         amountClaimed = claimablePayout(tokenId);
         require(amountClaimed > 0, "VestingNFT: No pending payout");
-        
+
         emit PayoutClaimed(tokenId, msg.sender, amountClaimed);
-        
+
         _payoutClaimed[tokenId] += amountClaimed;
         IERC20(payoutToken(tokenId)).safeTransfer(msg.sender, amountClaimed);
     }
@@ -47,44 +48,77 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     /**
      * @dev See {IVestingNFT}.
      */
-    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp) public view virtual override(IVestingNFT) returns (uint256 payout);
+    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
+        public
+        view
+        virtual
+        override(IVestingNFT)
+        returns (uint256 payout);
 
     /**
      * @dev See {IVestingNFT}.
      */
-    function vestingPayout(uint256 tokenId) public view override(IVestingNFT)  validToken(tokenId) returns (uint256 payout) {
+    function vestingPayout(uint256 tokenId)
+        public
+        view
+        override(IVestingNFT)
+        validToken(tokenId)
+        returns (uint256 payout)
+    {
         return _payout(tokenId) - vestedPayout(tokenId);
     }
 
     /**
      * @dev See {IVestingNFT}.
      */
-    function claimablePayout(uint256 tokenId) public view override(IVestingNFT) validToken(tokenId) returns (uint256 payout) {
+    function claimablePayout(uint256 tokenId)
+        public
+        view
+        override(IVestingNFT)
+        validToken(tokenId)
+        returns (uint256 payout)
+    {
         return vestedPayout(tokenId) - _payoutClaimed[tokenId];
     }
 
     /**
      * @dev See {IVestingNFT}.
      */
-    function vestingPeriod(uint256 tokenId) public view override(IVestingNFT) validToken(tokenId) returns (uint256 vestingStart, uint256 vestingEnd) {
+    function vestingPeriod(uint256 tokenId)
+        public
+        view
+        override(IVestingNFT)
+        validToken(tokenId)
+        returns (uint256 vestingStart, uint256 vestingEnd)
+    {
         return (_startTime(tokenId), _endTime(tokenId));
     }
 
     /**
      * @dev See {IVestingNFT}.
      */
-    function payoutToken(uint256 tokenId) public view override(IVestingNFT) validToken(tokenId) returns (address token) {
+    function payoutToken(uint256 tokenId)
+        public
+        view
+        override(IVestingNFT)
+        validToken(tokenId)
+        returns (address token)
+    {
         return _payoutToken(tokenId);
     }
 
     /**
      * @dev See {IERC165-supportsInterface}.
-     * IVestingNFT interfaceId = 0xf8600f8b 
+     * IVestingNFT interfaceId = 0xf8600f8b
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721, IERC165) returns (bool supported) {
-        return
-            interfaceId == type(IVestingNFT).interfaceId ||
-            super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, IERC165)
+        returns (bool supported)
+    {
+        return interfaceId == type(IVestingNFT).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**
@@ -93,29 +127,29 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
      * @param tokenId on which to check the its payout address
      * @return address payout token address
      */
-    function _payoutToken(uint256 tokenId) internal view virtual returns(address);
-    
+    function _payoutToken(uint256 tokenId) internal view virtual returns (address);
+
     /**
      * @dev Internal function to get the payout of a given vesting NFT
      *
      * @param tokenId to check
      * @return uint256 the total payout of a given vesting NFT
      */
-     function _payout(uint256 tokenId) internal view virtual returns(uint256);
-         
+    function _payout(uint256 tokenId) internal view virtual returns (uint256);
+
     /**
      * @dev Internal function to get the start time of a given vesting NFT
      *
      * @param tokenId to check
      * @return uint256 the start time in epoch timestamp
      */
-    function _startTime(uint256 tokenId) internal view virtual returns(uint256);
-         
+    function _startTime(uint256 tokenId) internal view virtual returns (uint256);
+
     /**
      * @dev Internal function to get the end time of a given vesting NFT
      *
      * @param tokenId to check
      * @return uint256 the end time in epoch timestamp
      */
-    function _endTime(uint256 tokenId) internal view virtual returns(uint256);
- }
+    function _endTime(uint256 tokenId) internal view virtual returns (uint256);
+}
