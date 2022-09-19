@@ -66,7 +66,7 @@ contract VestingNFT is BaseVestingNFT {
         if (timestamp >= _endTime(tokenId)) {
             return _payout(tokenId);
         }
-        return 0; 
+        return 0;
     }
 
     /**

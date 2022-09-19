@@ -132,7 +132,7 @@ abstract contract BaseVestingNFT is IVestingNFT, ERC721 {
     /**
      * @dev Internal function to get the total payout of a given vesting NFT.
      * @dev This is the total that will be paid out to the NFT owner, including historical tokens.
-     * 
+     *
      * @param tokenId to check
      * @return uint256 the total payout of a given vesting NFT
      */
