@@ -28,31 +28,29 @@ contract LinearVestingNFT is BaseVestingNFT {
      * @dev Token amount should be approved to be transferred by this contract before executing create
      * @param to The recipient of the NFT
      * @param amount The total assets to be locked over time
-     * @param startTime When the vesting starts in epoch timestamp
-     * @param duration The vesting duration in seconds
-     * @param cliff The cliff duration in seconds
+     * @param cliff The timestamp when linear vesting starts
+     * @param endTime The timestamp when all tokens have been fully vested
      * @param token The ERC20 token to vest over time
      */
     function create(
         address to,
         uint256 amount,
-        uint128 startTime,
-        uint128 duration,
         uint128 cliff,
+        uint128 endTime,
         IERC20 token
     ) public virtual {
-        require(startTime >= block.timestamp, "startTime cannot be in the past");
+        require(endTime > block.timestamp, "endTime cannot be in the past");
+        require(endTime > cliff, "cliff must be less than endTime");
         require(to != address(0), "to cannot be address 0");
-        require(cliff <= duration, "duration needs to be more than cliff");
 
         uint256 newTokenId = _tokenIdTracker;
 
         vestDetails[newTokenId] = VestDetails({
             payoutToken: token,
             payout: amount,
-            startTime: startTime,
-            endTime: startTime + duration,
-            cliff: startTime + cliff
+            startTime: uint128(block.timestamp),
+            endTime: endTime,
+            cliff: cliff
         });
 
         _tokenIdTracker++;
