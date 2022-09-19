@@ -41,7 +41,7 @@ contract LinearVestingNFT is BaseVestingNFT {
         uint128 cliff,
         IERC20 token
     ) public virtual {
-        require(startTime >= block.timestamp, "startTime cannot be on the past");
+        require(startTime >= block.timestamp, "startTime cannot be in the past");
         require(to != address(0), "to cannot be address 0");
         require(cliff <= duration, "duration needs to be more than cliff");
 
@@ -110,7 +110,7 @@ contract LinearVestingNFT is BaseVestingNFT {
     /**
      * @dev Internal function to get the cliff time of a given linear vesting NFT
      *
-     * @param tokenId on to check
+     * @param tokenId to check
      * @return uint256 the cliff time in seconds
      */
     function _cliff(uint256 tokenId) internal view returns (uint256) {

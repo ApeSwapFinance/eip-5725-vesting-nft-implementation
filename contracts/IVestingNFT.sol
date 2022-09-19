@@ -44,6 +44,7 @@ interface IVestingNFT is IERC721 {
 
     /**
      * @notice Number of tokens for a NFT which are currently vesting or locked
+     * @dev vestedPayoutAtTime(tokenId, type(uint).max) - vestedPayout(tokenId)
      * @param tokenId The NFT token id
      * @return payout The number of tokens for the NFT which have not been claimed yet
      */

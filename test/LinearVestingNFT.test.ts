@@ -84,7 +84,7 @@ describe('LinearVestingNFT', function () {
         0,
         mockToken.address
       )
-    ).to.revertedWith('startTime cannot be on the past')
+    ).to.revertedWith('startTime cannot be in the past')
   })
 
   it('Reverts when duration is less than cliff', async function () {
