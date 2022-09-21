@@ -134,7 +134,6 @@ interface IVestingNFT is IERC721 {
 
     /**
      * @notice The start and end timestamps for the vesting of the provided NFT
-     * @dev MUST return the mint timestamp as the `vestingStart`
      * MUST return the timestamp where no further increase in vestedPayout occurs for `vestingEnd`. 
      * @param tokenId The NFT token id
      * @return vestingStart The beginning of the vesting as a unix timestamp
