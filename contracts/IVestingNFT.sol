@@ -23,20 +23,20 @@ interface IVestingNFT is IERC721 {
     function claim(uint256 tokenId) external returns (uint256 amountClaimed);
 
     /**
-     * @notice Total amount of tokens which have been vested at the current timestamp.
+     * @notice Total amount of tokens which have been vested at the current timestamp. 
      *   This number also includes vested tokens which have been claimed.
-     * @dev It is RECOMMENDED that this function calls `vestedPayoutAtTime` with `block.timestamp`
-     *   as the `timestamp` parameter.
+     * @dev It is RECOMMENDED that this function calls `vestedPayoutAtTime` with 
+     *   `block.timestamp` as the `timestamp` parameter.
      * @param tokenId The NFT token id
      * @return payout Total amount of tokens which have been vested at the current timestamp.
      */
     function vestedPayout(uint256 tokenId) external view returns (uint256 payout);
 
     /**
-     * @notice Total amount of vested tokens at the provided timestamp.
-     *   This number also includes vested tokens which have been claimed
-     * @dev `timestamp` MAY be both in the future and in the past
-     * Zero MUST be returned if the timestamp is before the token was minted
+     * @notice Total amount of vested tokens at the provided timestamp. 
+     *   This number also includes vested tokens which have been claimed.
+     * @dev `timestamp` MAY be both in the future and in the past.
+     * Zero MUST be returned if the timestamp is before the token was minted.
      * @param tokenId The NFT token id
      * @param timestamp The timestamp to check on, can be both in the past and the future
      * @return payout Total amount of tokens which have been vested at the provided timestamp
@@ -44,8 +44,8 @@ interface IVestingNFT is IERC721 {
     function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp) external view returns (uint256 payout);
 
     /**
-     * @notice Number of tokens for a NFT which are currently vesting or locked
-     * @dev vestedPayoutAtTime(tokenId, type(uint).max) - vestedPayout(tokenId)
+     * @notice Number of tokens for an NFT which are currently vesting (locked).
+     * @dev The sum of vestedPayout and vestingPayout SHOULD always be the total payout.
      * @param tokenId The NFT token id
      * @return payout The number of tokens for the NFT which have not been claimed yet,
      *   regardless of whether they are ready to claim
@@ -63,7 +63,7 @@ interface IVestingNFT is IERC721 {
 
     /**
      * @notice The start and end timestamps for the vesting of the provided NFT
-     * MUST return the timestamp where no further increase in vestedPayout occurs for `vestingEnd`
+     * MUST return the timestamp where no further increase in vestedPayout occurs for `vestingEnd`.
      * @param tokenId The NFT token id
      * @return vestingStart The beginning of the vesting as a unix timestamp
      * @return vestingEnd The ending of the vesting as a unix timestamp
