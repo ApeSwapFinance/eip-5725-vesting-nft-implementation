@@ -1,7 +1,7 @@
 import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import 'solidity-coverage'
-import 'hardhat-docgen'
+import 'solidity-docgen'
 
 import { task, types } from 'hardhat/config'
 import { TASK_TEST } from 'hardhat/builtin-tasks/task-names'
@@ -173,9 +173,9 @@ const config: HardhatUserConfig = {
     excludeContracts: [],
   },
   docgen: {
-    path: './docs',
-    clear: true,
-    runOnCompile: true,
+    outputDir: './docs',
+    pages: 'items',
+    exclude: ['Migrations.sol', '/mocks'],
   },
   typechain: {
     // outDir: 'src/types', // defaults to './typechain-types/'

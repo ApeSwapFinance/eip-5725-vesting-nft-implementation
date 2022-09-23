@@ -24,7 +24,7 @@ contract VestingNFT is BaseVestingNFT {
 
     /**
      * @notice Creates a new vesting NFT and mints it
-     * @dev Token amount should be approved to be transfered by this contract before executing create
+     * @dev Token amount should be approved to be transferred by this contract before executing create
      * @param to The recipient of the NFT
      * @param amount The total assets to be locked over time
      * @param releaseTimestamp When the full amount of tokens get released
@@ -37,6 +37,7 @@ contract VestingNFT is BaseVestingNFT {
         IERC20 token
     ) public virtual {
         require(to != address(0), "to cannot be address 0");
+        require(releaseTimestamp > block.timestamp, "release must be in future");
 
         uint256 newTokenId = _tokenIdTracker;
 
@@ -65,6 +66,7 @@ contract VestingNFT is BaseVestingNFT {
         if (timestamp >= _endTime(tokenId)) {
             return _payout(tokenId);
         }
+        return 0;
     }
 
     /**

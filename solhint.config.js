@@ -36,6 +36,6 @@ module.exports = {
     "avoid-sha3": "error",
     "avoid-suicide": "error",
     "avoid-throw": "error",
-    // "not-rely-on-time": "off",
+    "not-rely-on-time": "off",
   },
 }

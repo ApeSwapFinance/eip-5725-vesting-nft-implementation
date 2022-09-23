@@ -1,0 +1,154 @@
+# Solidity API
+
+## BaseVestingNFT
+
+### _payoutClaimed
+
+```solidity
+mapping(uint256 => uint256) _payoutClaimed
+```
+
+_mapping for claimed payouts_
+
+### validToken
+
+```solidity
+modifier validToken(uint256 tokenId)
+```
+
+Checks if the tokenId exists and its valid
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | The NFT token id |
+
+### claim
+
+```solidity
+function claim(uint256 tokenId) external returns (uint256 amountClaimed)
+```
+
+_See {IVestingNFT}._
+
+### vestedPayout
+
+```solidity
+function vestedPayout(uint256 tokenId) public view returns (uint256 payout)
+```
+
+_See {IVestingNFT}._
+
+### vestedPayoutAtTime
+
+```solidity
+function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp) public view virtual returns (uint256 payout)
+```
+
+_See {IVestingNFT}._
+
+### vestingPayout
+
+```solidity
+function vestingPayout(uint256 tokenId) public view returns (uint256 payout)
+```
+
+_See {IVestingNFT}._
+
+### claimablePayout
+
+```solidity
+function claimablePayout(uint256 tokenId) public view returns (uint256 payout)
+```
+
+_See {IVestingNFT}._
+
+### vestingPeriod
+
+```solidity
+function vestingPeriod(uint256 tokenId) public view returns (uint256 vestingStart, uint256 vestingEnd)
+```
+
+_See {IVestingNFT}._
+
+### payoutToken
+
+```solidity
+function payoutToken(uint256 tokenId) public view returns (address token)
+```
+
+_See {IVestingNFT}._
+
+### supportsInterface
+
+```solidity
+function supportsInterface(bytes4 interfaceId) public view virtual returns (bool supported)
+```
+
+_See {IERC165-supportsInterface}.
+IVestingNFT interfaceId = 0xf8600f8b_
+
+### _payoutToken
+
+```solidity
+function _payoutToken(uint256 tokenId) internal view virtual returns (address)
+```
+
+_Internal function to get the payout token of a given vesting NFT_
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | on which to check the payout token address |
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | address | address payout token address |
+
+### _payout
+
+```solidity
+function _payout(uint256 tokenId) internal view virtual returns (uint256)
+```
+
+_Internal function to get the total payout of a given vesting NFT.
+This is the total that will be paid out to the NFT owner, including historical tokens._
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | to check |
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 the total payout of a given vesting NFT |
+
+### _startTime
+
+```solidity
+function _startTime(uint256 tokenId) internal view virtual returns (uint256)
+```
+
+_Internal function to get the start time of a given vesting NFT_
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | to check |
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 the start time in epoch timestamp |
+
+### _endTime
+
+```solidity
+function _endTime(uint256 tokenId) internal view virtual returns (uint256)
+```
+
+_Internal function to get the end time of a given vesting NFT_
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| tokenId | uint256 | to check |
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| [0] | uint256 | uint256 the end time in epoch timestamp |
+
