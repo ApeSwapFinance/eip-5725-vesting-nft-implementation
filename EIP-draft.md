@@ -37,14 +37,14 @@ requires: 721
 A **Non-Fungible Token** (NFT) standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve. 
 
 ## Abstract
-The following standard allows for the implementation of a standard API for NFT based contracts that hold and represent the vested and locked properties of any underlying token (ERC-20 or otherwise) that is emitted to the NFT holder. This standard is an extension on the ERC-721 token that provides basic functionality for creating vesting NFTs, claiming the tokens and reading vesting curve properties.
+The following standard allows for the implementation of a standard API for NFT based contracts that hold and represent the vested and locked properties of any underlying token (ERC-20 or otherwise) that is emitted to the NFT holder. This standard is an extension of the ERC-721 token that provides basic functionality for creating vesting NFTs, claiming the tokens and reading vesting curve properties.
 
 ## Motivation
-Vesting contracts, as well as timelock contracts, lack a standard and unified interface. This leads to the development of diverse implementations. The standardization of these contracts into a single interface would allow for the creation of an ecosystem of on- and off-chain tooling around these contracts. In addition of this, liquid vesting in the form of Non-Fungible assets can prove to be a huge improvement over traditional **Simple Agreement for Future Tokens** (SAFTs) or **Externally Owned Account** (EOA) based vesting as it enables transferability and the ability to attach metadata similar to the existing functionality offered by with traditional NFTs. 
+Vesting contracts, including timelock contracts, lack a standard and unified interface, which results in diverse implementations of such contracts. Standardizing such contracts into a single interface would allow for the creation of an ecosystem of on- and off-chain tooling around these contracts. In addition of this, liquid vesting in the form of non-fungible assets can prove to be a huge improvement over traditional **Simple Agreement for Future Tokens** (SAFTs) or **Externally Owned Account** (EOA)-based vesting as it enables transferability and the ability to attach metadata similar to the existing functionality offered by with traditional NFTs. 
   
-Such a standard will not only provide a much-needed ERC-20 token lock standard, but will also open the gates to the creation of secondary marketplaces tailored for semi-liquid SAFTs.  
+Such a standard will not only provide a much-needed ERC-20 token lock standard, but will also enable the creation of secondary marketplaces tailored for semi-liquid SAFTs.  
 
-This standard also provides a way to easily implement a variety of different vesting curves.  
+This standard also allows for a variety of different vesting curves to be implement easily.  
 
 These curves could represent: 
 - linear vesting
@@ -56,10 +56,10 @@ These curves could represent:
 1. A framework  to release tokens over a set period of time that can be used to build many kinds of NFT financial products such as bonds, treasury bills, and many others.
 2. Replicating SAFT contracts in a standardized form of semi-liquid vesting NFT assets
     - SAFTs are generally off-chain, while today's on-chain versions are mainly address-based, which makes distributing vesting shares to many representatives difficult. Standardization simplifies this convoluted process.
-3. Provide a path for standardization of vesting and token timelock contracts
-    - There are many such contracts in the wild and nearly all of these differ both in interface and implementation.
+3. Providing a path for the standardization of vesting and token timelock contracts
+    - There are many such contracts in the wild and most of them differ in both interface and implementation.
 4. NFT marketplaces dedicated to vesting NFTs
-    - Completely new sets of interfaces and analytics could be created from a common standard for token vesting NFTs.
+    - Whole new sets of interfaces and analytics could be created from a common standard for token vesting NFTs.
 5. Integrating vesting NFTs into services like Gnosis Safe
     - A standard would mean services like Gnosis Safe could more easily and uniformly support interactions with these types of contracts inside of a multisig contract.
 6. Enable standardized fundraising implementations and general fundraising that sell vesting tokens (eg. SAFTs) in a more transparent manner.
