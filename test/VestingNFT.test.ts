@@ -60,29 +60,29 @@ describe('VestingNFT', function () {
 
   it('Reverts with invalid ID', async function () {
     await expect(vestingNFT.vestedPayout(1)).to.revertedWith(
-      'VestingNFT: invalid token ID'
+      'ERC5725: invalid token ID'
     )
     await expect(vestingNFT.vestedPayoutAtTime(1, unlockTime)).to.revertedWith(
-      'VestingNFT: invalid token ID'
+      'ERC5725: invalid token ID'
     )
     await expect(vestingNFT.vestingPayout(1)).to.revertedWith(
-      'VestingNFT: invalid token ID'
+      'ERC5725: invalid token ID'
     )
     await expect(vestingNFT.claimablePayout(1)).to.revertedWith(
-      'VestingNFT: invalid token ID'
+      'ERC5725: invalid token ID'
     )
     await expect(vestingNFT.vestingPeriod(1)).to.revertedWith(
-      'VestingNFT: invalid token ID'
+      'ERC5725: invalid token ID'
     )
     await expect(vestingNFT.payoutToken(1)).to.revertedWith(
-      'VestingNFT: invalid token ID'
+      'ERC5725: invalid token ID'
     )
     await expect(vestingNFT.claim(1)).to.revertedWith(
-      'VestingNFT: invalid token ID'
+      'ERC5725: invalid token ID'
     )
     // NOTE: Removed claimTo from spec
     // await expect(vestingNFT.claimTo(1, receiverAccount)).to.revertedWith(
-    //   "VestingNFT: invalid token ID"
+    //   "ERC5725: invalid token ID"
     // );
   })
 
@@ -119,7 +119,7 @@ describe('VestingNFT', function () {
   it('Reverts claim when payout is 0', async function () {
     const connectedVestingNft = vestingNFT.connect(accounts[1])
     await expect(connectedVestingNft.claim(0)).to.revertedWith(
-      'VestingNFT: No pending payout'
+      'ERC5725: No pending payout'
     )
   })
 
