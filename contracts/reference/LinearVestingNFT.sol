@@ -21,7 +21,11 @@ contract LinearVestingNFT is ERC5725 {
     /**
      * @dev See {IERC5725}.
      */
-    constructor(string memory name, string memory symbol, IVestingCurve vestingCurve) ERC5725(vestingCurve) ERC721(name, symbol) {}
+    constructor(
+        string memory name,
+        string memory symbol,
+        IVestingCurve vestingCurve
+    ) ERC5725(vestingCurve) ERC721(name, symbol) {}
 
     /**
      * @notice Creates a new vesting NFT and mints it
