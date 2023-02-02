@@ -1,92 +1,79 @@
 ---
-eip: <to be assigned>
-title: Transferable Vesting NFT standard
-description: A standard for transferable vesting NFTs which release underlying tokens (ERC-20 or otherwise) over time.
-# TODO: Fill in proper org and user names
-author: Apeguru (https://github.com/Apegurus), Marco (CTO & Co-Founder @0xPaladinSec), Mario (Lead of Development Team @0xPaladinSec), DeFiFoFum (https://github.com/DeFiFoFum)
-# TODO: Add in discussion URL
-discussions-to: <URL>
+eip: 5725
+title: Transferable Vesting NFT
+description: An interface for transferable vesting NFTs which release underlying tokens over time.
+author: Apeguru (@Apegurus), Marco De Vries <marco@paladinsec.co>, Mario <mario@paladinsec.co>, DeFiFoFum (@DeFiFoFum)
+discussions-to: https://ethereum-magicians.org/t/eip-5725-transferable-vesting-nft/11099
 status: Draft
 type: Standards Track
 category: ERC
 created: 2022-09-08
 requires: 721
 ---
-# EIP-XXXX Vesting NFT Standard
-
-## Table of Contents
-- [EIP-XXXX Vesting NFT Standard](#eip-xxxx-vesting-nft-standard)
-  - [Table of Contents](#table-of-contents)
-  - [Simple Summary](#simple-summary)
-  - [Abstract](#abstract)
-  - [Motivation](#motivation)
-    - [Use Cases](#use-cases)
-  - [Specification](#specification)
-  - [Rationale](#rationale)
-  - [Backwards Compatibility](#backwards-compatibility)
-  - [Reference Implementation](#reference-implementation)
-  - [Test Cases](#test-cases)
-  - [Security Considerations](#security-considerations)
-  - [Extensions](#extensions)
-  - [References](#references)
-  - [Copyright](#copyright)
-  - [Citation](#citation)
-
-
-## Simple Summary
-A **Non-Fungible Token** (NFT) standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve. 
 
 ## Abstract
-The following standard allows for the implementation of a standard API for NFT based contracts that hold and represent the vested and locked properties of any underlying token (ERC-20 or otherwise) that is emitted to the NFT holder. This standard is an extension of the ERC-721 token that provides basic functionality for creating vesting NFTs, claiming the tokens and reading vesting curve properties.
+
+A **Non-Fungible Token** (NFT) standard used to vest tokens ([EIP-20](./eip-20.md) or otherwise) over a vesting release curve.
+
+The following standard allows for the implementation of a standard API for NFT based contracts that hold and represent the vested and locked properties of any underlying token ([EIP-20](./eip-20.md) or otherwise) that is emitted to the NFT holder. This standard is an extension of the [EIP-721](./eip-721.md) token that provides basic functionality for creating vesting NFTs, claiming the tokens and reading vesting curve properties.
 
 ## Motivation
-Vesting contracts, including timelock contracts, lack a standard and unified interface, which results in diverse implementations of such contracts. Standardizing such contracts into a single interface would allow for the creation of an ecosystem of on- and off-chain tooling around these contracts. In addition of this, liquid vesting in the form of non-fungible assets can prove to be a huge improvement over traditional **Simple Agreement for Future Tokens** (SAFTs) or **Externally Owned Account** (EOA)-based vesting as it enables transferability and the ability to attach metadata similar to the existing functionality offered by with traditional NFTs. 
+
+Vesting contracts, including timelock contracts, lack a standard and unified interface, which results in diverse implementations of such contracts. Standardizing such contracts into a single interface would allow for the creation of an ecosystem of on- and off-chain tooling around these contracts. In addition, liquid vesting in the form of non-fungible assets can prove to be a huge improvement over traditional **Simple Agreement for Future Tokens** (SAFTs) or **Externally Owned Account** (EOA)-based vesting as it enables transferability and the ability to attach metadata similar to the existing functionality offered by with traditional NFTs.
   
-Such a standard will not only provide a much-needed ERC-20 token lock standard, but will also enable the creation of secondary marketplaces tailored for semi-liquid SAFTs.  
+Such a standard will not only provide a much-needed [EIP-20](./eip-20.md) token lock standard, but will also enable the creation of secondary marketplaces tailored for semi-liquid SAFTs.
 
-This standard also allows for a variety of different vesting curves to be implement easily.  
+This standard also allows for a variety of different vesting curves to be implement easily.
 
-These curves could represent: 
+These curves could represent:
+
 - linear vesting
 - cliff vesting
 - exponential vesting
 - custom deterministic vesting
 
 ### Use Cases
+
 1. A framework  to release tokens over a set period of time that can be used to build many kinds of NFT financial products such as bonds, treasury bills, and many others.
-2. Replicating SAFT contracts in a standardized form of semi-liquid vesting NFT assets
+2. Replicating SAFT contracts in a standardized form of semi-liquid vesting NFT assets.
     - SAFTs are generally off-chain, while today's on-chain versions are mainly address-based, which makes distributing vesting shares to many representatives difficult. Standardization simplifies this convoluted process.
-3. Providing a path for the standardization of vesting and token timelock contracts
+3. Providing a path for the standardization of vesting and token timelock contracts.
     - There are many such contracts in the wild and most of them differ in both interface and implementation.
-4. NFT marketplaces dedicated to vesting NFTs
+4. NFT marketplaces dedicated to vesting NFTs.
     - Whole new sets of interfaces and analytics could be created from a common standard for token vesting NFTs.
-5. Integrating vesting NFTs into services like Gnosis Safe
+5. Integrating vesting NFTs into services like Gnosis Safe.
     - A standard would mean services like Gnosis Safe could more easily and uniformly support interactions with these types of contracts inside of a multisig contract.
 6. Enable standardized fundraising implementations and general fundraising that sell vesting tokens (eg. SAFTs) in a more transparent manner.
 7. Allows tools, front-end apps, aggregators, etc. to show a more holistic view of the vesting tokens and the properties available to users.
     - Currently, every project needs to write their own visualization of the vesting schedule of their vesting assets. If this is standardized, third-party tools could be developed aggregate all vesting NFTs from all projects for the user, display their schedules and allow the user to take aggregated vesting actions.
-    - Such tooling can easily discover compliance through the EIP-165 supportsInterface(IVestingNFT) check.
+    - Such tooling can easily discover compliance through the [EIP-165](./eip-165.md) `supportsInterface(InterfaceID)` check.
 8. Makes it easier for a single wrapping implementation to be used across all vesting standards that defines multiple recipients, periodic renting of vesting tokens etc.
 
 
 ## Specification
-<!-- The technical specification should describe the syntax and semantics of any new feature. The specification should be detailed enough to allow competing, interoperable implementations for any of the current Ethereum platforms (go-ethereum, parity, cpp-ethereum, ethereumj, ethereumjs, and [others](https://github.com/ethereum/wiki/wiki/Clients)). -->
+
 The key words “MUST”, “MUST NOT”, “REQUIRED”, “SHALL”, “SHALL NOT”, “SHOULD”, “SHOULD NOT”, “RECOMMENDED”, “MAY”, and “OPTIONAL” in this document are to be interpreted as described in RFC 2119.
 
 ```solidity
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @title Non-Fungible Vesting Token Standard
- * @notice A non-fungible token standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve
+ * @notice A non-fungible token standard used to vest tokens (EIP-20 or otherwise) over a vesting release curve
  *  scheduled using timestamps.
  * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
  */
-interface IVestingNFT is IERC721 {
-    event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 _claimAmount);
+interface IERC5725 is IERC721 {
+    /**
+    *  This event is emitted when the payout is claimed through the claim function
+    *  @param tokenId the NFT tokenId of the assets being claimed.
+    *  @param recipient The address which is receiving the payout.
+    *  @param claimAmount The amount of tokens being claimed.
+    */
+    event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 claimAmount);
 
     /**
      * @notice Claim the pending payout for the NFT
@@ -94,9 +81,8 @@ interface IVestingNFT is IERC721 {
      * MUST revert if not called by the token owner or approved users
      * SHOULD revert if there is nothing to claim
      * @param tokenId The NFT token id
-     * @return amountClaimed The amount of tokens claimed in this call
      */
-    function claim(uint256 tokenId) external returns (uint256 amountClaimed);
+    function claim(uint256 tokenId) external;
 
     /**
      * @notice Total amount of tokens which have been vested at the current timestamp.
@@ -157,69 +143,74 @@ interface IVestingNFT is IERC721 {
 
 
 ## Rationale
-<!-- The rationale fleshes out the specification by describing what motivated the design and why particular design decisions were made. It should describe alternate designs that were considered and related work, e.g. how the feature is supported in other languages. -->
-**vesting terms**
-- _vesting_: Tokens which are locked until a future date
+
+### Terms
+
+These are base terms used around the specification which function names and definitions are based on.
+
+- _vesting_: Tokens which are locked until a future date.
 - _vested_: Tokens which have reached their unlock date. (The usage in this specification relates to the **total** vested tokens for a given Vesting NFT.)
-- _claimable_: Amount of tokens which can be claimed at the current `timestamp`. 
-- _timestamp_: The [unix](https://www.unixtimestamp.com/) `timestamp` (seconds) representation of dates used for vesting. 
+- _claimable_: Amount of tokens which can be claimed at the current `timestamp`.
+- _timestamp_: The unix `timestamp` (seconds) representation of dates used for vesting.
 
-**vesting functions**
-- `vestingPayout()` and `vestedPayout()` add up to the total number of tokens which can be claimed by the end of of the vesting schedule, which is also equal to `vestedPayoutAtTime()` with `type(uint256).max` as the `timestamp`.
-- `vestedPayout()` will provide the total amount of tokens which are eligible for release (including claimed tokens), while `claimablePayout()` provides the amount of tokens which can be claimed at the current `timestamp`.
-- `vestedPayoutAtTime()` provides functionality to iterate through the `vestingPeriod()` and provide a visual of the release curve. This allows for tools to iterate through a vesting schedule and create a visualization using on-chain data. It would be incredible to see integrations such as [hot-chain-svg](https://github.com/w1nt3r-eth/hot-chain-svg) to be able to create SVG visuals of vesting curves directly on-chain. 
+### Vesting Functions
+
+**`vestingPayout` + `vestedPayout`**
+
+`vestingPayout(uint256 tokenId)` and `vestedPayout(uint256 tokenId)` add up to the total number of tokens which can be claimed by the end of of the vesting schedule. This is also equal to `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` with `type(uint256).max` as the `timestamp`.  
+
+The rationale for this is to guarantee that the tokens `vested` and tokens `vesting` are always in sync. The intent is that the vesting curves created are deterministic across the `vestingPeriod`.  
 
 
+**`vestedPayout` vs `claimablePayout`**
 
-**timestamps**
+- `vestedPayout(uint256 tokenId)` will provide the total amount of tokens which are eligible for release **including claimed tokens**.
+- `claimablePayout(uint256 tokenId)` provides the amount of tokens which can be claimed at the current `timestamp`.
+
+The rationale for providing two functions is so that the return of `vestedPayout(uint256 tokenId)` will always match the return of `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` with `block.timestamp` as the `timestamp`, and a separate function can be called to read how many tokens are available to claim.  
+
+`vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` provides functionality to iterate through the `vestingPeriod(uint256 tokenId)` and provide a visual of the release curve. The intent is that release curves are created which makes `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` deterministic.  
+
+### Timestamps
+
 Generally in Solidity development it is advised against using `block.timestamp` as a state dependant variable as the timestamp of a block can be manipulated by a miner. The choice to use a `timestamp` over a `block` is to allow the interface to work across multiple **Ethereum Virtual Machine** (EVM) compatible networks which generally have different block times. Block proposal with a significantly fabricated timestamp will generally be dropped by all node implementations which makes the window for abuse negligible.
 
-The `timestamp` makes cross chain integration easy, but internally, the reference implementation keeps track of the token payout per Vesting NFT to ensure that excess tokens alloted by the vesting terms cannot be claimed. 
+The `timestamp` makes cross chain integration easy, but internally, the reference implementation keeps track of the token payout per Vesting NFT to ensure that excess tokens alloted by the vesting terms cannot be claimed.
 
+### Limitation of Scope
 
-## Backwards Compatibility
-<!-- All EIPs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The EIP must explain how the author proposes to deal with these incompatibilities. EIP submissions without a sufficient backwards compatibility treatise may be rejected outright. -->
-- The Vesting NFT standard is meant to be fully backwards compatible with any current [ERC-721 standard](https://eips.ethereum.org/EIPS/eip-721) integrations and marketplaces.
-- The Vesting NFT standard also supports [ERC-165 standard](https://eips.ethereum.org/EIPS/eip-165) interface detection for detecting `ERC-721` compatibility, as well as Vesting NFT compatibility.
+The standard does not implement the following features:
 
-## Reference Implementation
-<!-- An optional section that contains a reference/example implementation that people can use to assist in understanding or implementing this specification.  If the implementation is too large to reasonably be included inline, then consider adding it as one or more files in `../assets/eip-####/`. -->
-<!-- TODO: Add proper link to url when -->
-A reference implementation of this EIP can be found in [this repository](https://github.com/ApeSwapFinance/eip-xxxx-vesting-nft-implementation).
-
-
-## Test Cases
-The reference vesting NFT repository includes tests written in Hardhat.
-
-
-## Security Considerations
-<!-- All EIPs must contain a section that discusses the security implications/considerations relevant to the proposed change. Include information that might be important for security discussions, surfaces risks and can be used throughout the life cycle of the proposal. E.g. include security-relevant design decisions, concerns, important discussions, implementation-specific guidance and pitfalls, an outline of threats and risks and how they are being addressed. EIP submissions missing the "Security Considerations" section will be rejected. An EIP cannot proceed to status "Final" without a Security Considerations discussion deemed sufficient by the reviewers. -->
-**timestamps**
-- Vesting schedules are based on timestamps. As such, it's important to keep track of the number of tokens which have been claimed and to not give out more tokens than alloted for a specific Vesting NFT. 
-  - `vestedPayoutAtTime(tokenId, type(uint256).max)`, for example, must return the total payout for a given `tokenId`
-
-**approvals**
-- When an approval is made on a Vesting NFT, the operator would have the rights to transfer the Vesting NFT to themselves and then claim the vested tokens.
-
-## Extensions
 - Vesting Curves
 - Rental
 - Beneficiary
 
-## References
-Standards
+This is done intentionally to keep the base standard simple. These features can and likely will be added through extensions of this standard.
 
-- [ERC-20](https://eips.ethereum.org/EIPS/eip-20) Token Standard.
-- [ERC-165](https://eips.ethereum.org/EIPS/eip-165) Standard Interface Detection.
-- [ERC-721](https://eips.ethereum.org/EIPS/eip-721) Token Standard.
+## Backwards Compatibility
 
-- [Timestamp Dependence](https://consensys.github.io/smart-contract-best-practices/development-recommendations/solidity-specific/timestamp-dependence/#the-15-second-rule) The 15-second Rule.
-- [hot-chain-svg](https://github.com/w1nt3r-eth/hot-chain-svg) On-chain SVG generator. Could be used to generate vesting curves for Vesting NFTs on-chain.
+- The Vesting NFT standard is meant to be fully backwards compatible with any current [EIP-721](./eip-721.md) integrations and marketplaces.
+- The Vesting NFT standard also supports [EIP-165](./eip-165.md) interface detection for detecting `EIP-721` compatibility, as well as Vesting NFT compatibility.
+
+## Test Cases
+
+The reference vesting NFT repository includes tests written in Hardhat.
+
+## Reference Implementation
+
+A reference implementation of this EIP can be found in [eip-5725 assets](../assets/eip-5725/README.md/).
+
+## Security Considerations
+
+**timestamps**
+
+- Vesting schedules are based on timestamps. As such, it's important to keep track of the number of tokens which have been claimed and to not give out more tokens than alloted for a specific Vesting NFT.
+  - `vestedPayoutAtTime(tokenId, type(uint256).max)`, for example, must return the total payout for a given `tokenId`
+
+**approvals**
+
+- When an approval is made on a Vesting NFT, the operator would have the rights to transfer the Vesting NFT to themselves and then claim the vested tokens.
 
 ## Copyright
-Copyright and related rights waived via [CC0](../LICENSE.md).
 
-## Citation
-Please cite this document as:
-<!-- TODO: Update XXXX with EIP number -->
-Apeguru, Marco, Mario, DeFiFoFum, "EIP-XXXX: Vesting NFT Standard," Ethereum Improvement Proposals, no. XXXX, September 2022. [Online serial]. Available: https://eips.ethereum.org/EIPS/eip-XXXX. 
+Copyright and related rights waived via [CC0](../LICENSE.md).

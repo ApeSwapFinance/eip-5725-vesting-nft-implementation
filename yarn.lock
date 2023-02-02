@@ -5512,7 +5512,7 @@ solidity-coverage@^0.7.21:
     shelljs "^0.8.3"
     web3-utils "^1.3.0"
 
-solidity-docgen@^1.3.0:
+solidity-docgen@0.6.0-beta.26:
   version "0.6.0-beta.26"
   resolved "https://registry.yarnpkg.com/solidity-docgen/-/solidity-docgen-0.6.0-beta.26.tgz#0a7876ded59f2c1c3611281e97d8eae7bf78519f"
   integrity sha512-Hgg9S+iP3BjUJ/g+jBPRgv3hzy8VV8QygGW1YY/Ar8DFIt9ZrCmVDqek2JObpcQODuk+qzRuh8SOwWHMNC9mVg==

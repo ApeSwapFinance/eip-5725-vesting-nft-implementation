@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
@@ -9,8 +9,14 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
  * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
  */
-interface IVestingNFT is IERC721 {
-    event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 _claimAmount);
+interface IERC5725 is IERC721 {
+   /**
+    *  This event is emitted when the payout is claimed through the claim function
+    *  @param tokenId the NFT tokenId of the assets being claimed.
+    *  @param recipient The address which is receiving the payout.
+    *  @param claimAmount The amount of tokens being claimed.
+    */
+    event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 claimAmount);
 
     /**
      * @notice Claim the pending payout for the NFT
@@ -18,9 +24,8 @@ interface IVestingNFT is IERC721 {
      * MUST revert if not called by the token owner or approved users
      * SHOULD revert if there is nothing to claim
      * @param tokenId The NFT token id
-     * @return amountClaimed The amount of tokens claimed in this call
      */
-    function claim(uint256 tokenId) external returns (uint256 amountClaimed);
+    function claim(uint256 tokenId) external;
 
     /**
      * @notice Total amount of tokens which have been vested at the current timestamp.

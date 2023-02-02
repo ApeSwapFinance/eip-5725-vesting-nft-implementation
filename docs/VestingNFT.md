@@ -58,7 +58,7 @@ _Token amount should be approved to be transferred by this contract before execu
 function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp) public view returns (uint256 payout)
 ```
 
-_See {IVestingNFT}._
+_See {IERC5725}._
 
 ### _payoutToken
 
@@ -66,7 +66,7 @@ _See {IVestingNFT}._
 function _payoutToken(uint256 tokenId) internal view returns (address)
 ```
 
-_See {BaseVestingNFT}._
+_See {ERC5725}._
 
 ### _payout
 
@@ -74,7 +74,7 @@ _See {BaseVestingNFT}._
 function _payout(uint256 tokenId) internal view returns (uint256)
 ```
 
-_See {BaseVestingNFT}._
+_See {ERC5725}._
 
 ### _startTime
 
@@ -82,7 +82,7 @@ _See {BaseVestingNFT}._
 function _startTime(uint256 tokenId) internal view returns (uint256)
 ```
 
-_See {BaseVestingNFT}._
+_See {ERC5725}._
 
 ### _endTime
 
@@ -90,5 +90,5 @@ _See {BaseVestingNFT}._
 function _endTime(uint256 tokenId) internal view returns (uint256)
 ```
 
-_See {BaseVestingNFT}._
+_See {ERC5725}._
 
