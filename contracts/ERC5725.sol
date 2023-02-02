@@ -97,13 +97,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function payoutToken(uint256 tokenId)
-        public
-        view
-        override(IERC5725)
-        validToken(tokenId)
-        returns (address token)
-    {
+    function payoutToken(uint256 tokenId) public view override(IERC5725) validToken(tokenId) returns (address token) {
         return _payoutToken(tokenId);
     }
 
