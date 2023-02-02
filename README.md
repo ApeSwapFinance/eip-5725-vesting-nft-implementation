@@ -1,19 +1,16 @@
-# EIP-XXXX: Transferrable Vesting NFT - Reference Implementation
+# EIP-5725: Transferrable Vesting NFT - Reference Implementation
 [![lint & test](https://github.com/ApeSwapFinance/ercXXXX-vesting-nft/actions/workflows/lint-test.yml/badge.svg)](https://github.com/ApeSwapFinance/ercXXXX-vesting-nft/actions/workflows/lint-test.yml)
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This repository serves as a reference implementation for EIP-XXXX Transferrable Vesting NFT Standard. A Non-Fungible Token (NFT) standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve.   
+This repository serves as a reference implementation for EIP-5725 Transferrable Vesting NFT Standard. A Non-Fungible Token (NFT) standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve.   
 
-<!-- 
-TODO: Update all eip-xxxx, EIP-XXXX, etc with actual EIP number when obtained.
- -->
-## EIP-XXXX
-Find the official [EIP located here](https://eips.ethereum.org/EIPS/eip-xxxx).
+## EIP-5725
+Find the official [EIP located here](https://eips.ethereum.org/EIPS/eip-5725).
 
 ## Installation and Setup
-- `git clone git@github.com:ApeSwapFinance/eip-xxxx-vesting-nft-implementation.git`
-- `cd eip-xxxx-vesting-nft-implementation`
+- `git clone git@github.com:ApeSwapFinance/eip-5725-vesting-nft-implementation.git`
+- `cd eip-5725-vesting-nft-implementation`
 - `yarn`
 - Copy [.env.example](./.env.example) and rename to `.env`
   - Provide the necessary `env` variables before deployment/verification
