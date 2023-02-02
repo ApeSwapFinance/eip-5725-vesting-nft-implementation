@@ -7,16 +7,14 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./IERC5725.sol";
-import "./IVestingCurve.sol";
 
 abstract contract ERC5725 is IERC5725, ERC721 {
     using SafeERC20 for IERC20;
-    IVestingCurve public vestingCurve;
 
     /// @dev mapping for claimed payouts
     mapping(uint256 => uint256) /*tokenId*/ /*claimed*/
         internal _payoutClaimed;
-    
+
     /**
      * @notice Checks if the tokenId exists and its valid
      * @param tokenId The NFT token id
@@ -24,20 +22,6 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     modifier validToken(uint256 tokenId) {
         require(_exists(tokenId), "ERC5725: invalid token ID");
         _;
-    }
-
-    constructor(IVestingCurve vestingCurve_) {
-        (uint256 totalPayout, uint256 vestDuration, uint256 start) = (1e18, 1000, 1000);
-        require(
-            vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, 0) == 0,
-            "VestingCurve: Before vesting must be 0"
-        );
-        require(
-            vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, vestDuration + start + 1) ==
-                totalPayout,
-            "VestingCurve: After vesting must be totalPayout"
-        );
-        vestingCurve = vestingCurve_;
     }
 
     /**

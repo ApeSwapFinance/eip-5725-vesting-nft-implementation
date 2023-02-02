@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.17;
 
+import "./IVestingCurve.sol";
 import "../ERC5725.sol";
 
 contract LinearVestingNFT is ERC5725 {
@@ -10,11 +11,12 @@ contract LinearVestingNFT is ERC5725 {
         IERC20 payoutToken; /// @dev payout token
         uint256 payout; /// @dev payout token remaining to be paid
         uint128 startTime; /// @dev when vesting starts
-        uint128 endTime; /// @dev when vesting end
-        uint128 cliff; /// @dev duration in seconds of the cliff in which tokens will be begin releasing
+        uint128 vestingTerm; /// @dev duration of vesting schedule
     }
     mapping(uint256 => VestDetails) public vestDetails; /// @dev maps the vesting data with tokenIds
 
+    /// @dev immutable vesting release schedule
+    IVestingCurve public immutable vestingCurve;
     /// @dev tracker of current NFT id
     uint256 private _tokenIdTracker;
 
@@ -22,10 +24,22 @@ contract LinearVestingNFT is ERC5725 {
      * @dev See {IERC5725}.
      */
     constructor(
-        string memory name,
-        string memory symbol,
-        IVestingCurve vestingCurve
-    ) ERC5725(vestingCurve) ERC721(name, symbol) {}
+        string memory name_,
+        string memory symbol_,
+        IVestingCurve vestingCurve_
+    ) ERC721(name_, symbol_) {
+        (uint256 totalPayout, uint256 vestDuration, uint256 start) = (1e18, 1000, 1000);
+        require(
+            vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, 0) == 0,
+            "before vesting must be 0"
+        );
+        require(
+            vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, vestDuration + start + 1) ==
+                totalPayout,
+            "after vesting must be totalPayout"
+        );
+        vestingCurve = vestingCurve_;
+    }
 
     /**
      * @notice Creates a new vesting NFT and mints it
@@ -33,21 +47,18 @@ contract LinearVestingNFT is ERC5725 {
      * @param to The recipient of the NFT
      * @param amount The total assets to be locked over time
      * @param startTime When the vesting starts in epoch timestamp
-     * @param duration The vesting duration in seconds
-     * @param cliff The cliff duration in seconds
+     * @param vestingTerm The vesting duration in seconds
      * @param token The ERC20 token to vest over time
      */
     function create(
         address to,
         uint256 amount,
         uint128 startTime,
-        uint128 duration,
-        uint128 cliff,
+        uint128 vestingTerm,
         IERC20 token
     ) public virtual {
         require(startTime >= block.timestamp, "startTime cannot be on the past");
         require(to != address(0), "to cannot be address 0");
-        require(cliff <= duration, "duration needs to be more than cliff");
 
         uint256 newTokenId = _tokenIdTracker;
 
@@ -55,8 +66,7 @@ contract LinearVestingNFT is ERC5725 {
             payoutToken: token,
             payout: amount,
             startTime: startTime,
-            endTime: startTime + duration,
-            cliff: startTime + cliff
+            vestingTerm: vestingTerm
         });
 
         _tokenIdTracker++;
@@ -72,15 +82,16 @@ contract LinearVestingNFT is ERC5725 {
         view
         override(ERC5725)
         validToken(tokenId)
-        returns (uint256 payout)
+        returns (uint256)
     {
-        if (timestamp < _cliff(tokenId)) {
-            return 0;
-        }
-        if (timestamp > _endTime(tokenId)) {
-            return _payout(tokenId);
-        }
-        return (_payout(tokenId) * (timestamp - _startTime(tokenId))) / (_endTime(tokenId) - _startTime(tokenId));
+        VestDetails memory tokenVestDetails = vestDetails[tokenId];
+        return
+            vestingCurve.getVestedPayoutAtTime(
+                tokenVestDetails.payout,
+                tokenVestDetails.vestingTerm,
+                tokenVestDetails.startTime,
+                timestamp
+            );
     }
 
     /**
@@ -108,16 +119,7 @@ contract LinearVestingNFT is ERC5725 {
      * @dev See {ERC5725}.
      */
     function _endTime(uint256 tokenId) internal view override returns (uint256) {
-        return vestDetails[tokenId].endTime;
-    }
-
-    /**
-     * @dev Internal function to get the cliff time of a given linear vesting NFT
-     *
-     * @param tokenId to check
-     * @return uint256 the cliff time in seconds
-     */
-    function _cliff(uint256 tokenId) internal view returns (uint256) {
-        return vestDetails[tokenId].cliff;
+        VestDetails memory tokenVestDetails = vestDetails[tokenId];
+        return tokenVestDetails.startTime + tokenVestDetails.vestingTerm;
     }
 }

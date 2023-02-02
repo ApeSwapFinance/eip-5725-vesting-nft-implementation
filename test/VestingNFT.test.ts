@@ -24,7 +24,8 @@ describe('VestingNFT', function () {
     const linearVestingCurve = await LinearVestingCurve.deploy();
 
     const VestingNFT = await ethers.getContractFactory('VestingNFT')
-    vestingNFT = await VestingNFT.deploy('VestingNFT', 'TLV', linearVestingCurve.address) as VestingNFT
+    vestingNFT = await VestingNFT.deploy('VestingNFT', 'TLV') as VestingNFT
+    // vestingNFT = await VestingNFT.deploy('VestingNFT', 'TLV', linearVestingCurve.address) as VestingNFT
     await vestingNFT.deployed()
 
     const ERC20Mock = await ethers.getContractFactory('ERC20Mock')

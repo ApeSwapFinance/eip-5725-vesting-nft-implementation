@@ -74,7 +74,6 @@ describe('LinearVestingNFT', function () {
         testValues.payout,
         latestBlock.timestamp + testValues.buffer,
         testValues.lockTime,
-        0,
         mockToken.address
       )
     ).to.revertedWith('to cannot be address 0')
@@ -87,24 +86,9 @@ describe('LinearVestingNFT', function () {
         testValues.payout,
         0,
         testValues.lockTime,
-        0,
         mockToken.address
       )
     ).to.revertedWith('startTime cannot be on the past')
-  })
-
-  it('Reverts when duration is less than cliff', async function () {
-    const latestBlock = await ethers.provider.getBlock('latest')
-    await expect(
-      linearVestingNFT.create(
-        receiverAccount,
-        testValues.payout,
-        latestBlock.timestamp + testValues.buffer,
-        testValues.lockTime,
-        100,
-        mockToken.address
-      )
-    ).to.revertedWith('duration needs to be more than cliff')
   })
 })
 
@@ -121,7 +105,6 @@ async function createVestingNft(
     testValues.payout,
     latestBlock.timestamp + testValues.buffer,
     testValues.lockTime,
-    0,
     mockToken.address
   )
   await txReceipt.wait()
