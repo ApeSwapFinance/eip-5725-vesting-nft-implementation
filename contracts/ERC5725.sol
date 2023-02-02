@@ -20,7 +20,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
      * @param tokenId The NFT token id
      */
     modifier validToken(uint256 tokenId) {
-        require(_exists(tokenId), "VestingNFT: invalid token ID");
+        require(_exists(tokenId), "ERC5725: invalid token ID");
         _;
     }
 
@@ -30,7 +30,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     function claim(uint256 tokenId) external override(IERC5725) validToken(tokenId) {
         require(ownerOf(tokenId) == msg.sender, "Not owner of NFT");
         uint256 amountClaimed = claimablePayout(tokenId);
-        require(amountClaimed > 0, "VestingNFT: No pending payout");
+        require(amountClaimed > 0, "ERC5725: No pending payout");
 
         emit PayoutClaimed(tokenId, msg.sender, amountClaimed);
 
