@@ -8,6 +8,7 @@ import {
   ERC20Mock,
   LinearVestingNFT__factory,
   LinearVestingNFT,
+  LinearVestingCurve__factory
 } from '../typechain-types'
 
 const testValues = {
@@ -25,10 +26,15 @@ describe('LinearVestingNFT', function () {
   let unlockTime: number
 
   beforeEach(async function () {
+    const LinearVestingCurve = (await ethers.getContractFactory(
+      'LinearVestingCurve'
+    )) as LinearVestingCurve__factory
+    const linearVestingCurve = await LinearVestingCurve.deploy();
+    
     const LinearVestingNFT = (await ethers.getContractFactory(
       'LinearVestingNFT'
     )) as LinearVestingNFT__factory
-    linearVestingNFT = await LinearVestingNFT.deploy('LinearVestingNFT', 'TLV')
+    linearVestingNFT = await LinearVestingNFT.deploy('LinearVestingNFT', 'TLV', linearVestingCurve.address)
     await linearVestingNFT.deployed()
 
     const ERC20Mock = (await ethers.getContractFactory(

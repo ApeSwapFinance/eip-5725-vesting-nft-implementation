@@ -7,13 +7,21 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./IERC5725.sol";
+import "./IVestingCurve.sol";
 
 abstract contract ERC5725 is IERC5725, ERC721 {
     using SafeERC20 for IERC20;
+    IVestingCurve public vestingCurve;
 
     /// @dev mapping for claimed payouts
-    mapping(uint256 => uint256) /*tokenId*/ /*claimed*/
-        internal _payoutClaimed;
+    mapping(uint256 /*tokenId*/ => uint256 /*claimed*/) internal _payoutClaimed;
+
+    constructor(IVestingCurve vestingCurve_) {
+        (uint256 totalPayout, uint256 vestDuration, uint256 start) = (1e18, 1000, 1000);
+        require(vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, 0) == 0, 'VestingCurve: Before vesting must be 0');
+        require(vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, vestDuration + start + 1) == totalPayout, 'VestingCurve: After vesting must be totalPayout');
+        vestingCurve = vestingCurve_;
+    }
 
     /**
      * @notice Checks if the tokenId exists and its valid
@@ -120,6 +128,38 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     {
         return interfaceId == type(IERC5725).interfaceId || super.supportsInterface(interfaceId);
     }
+
+    // /**
+    //  *  @notice Return the amount of tokens unlocked at a specific timestamp. Includes claimed tokens.
+    //  * 
+    //  *  @dev Helper function for ERC5725. 
+    //  *  @param tokenId ID of Bill
+    //  *  @param timestamp timestamp to check
+    //  */
+    // function _payoutsAtTime(uint256 tokenId, uint256 timestamp) 
+    //     internal 
+    //     view
+    //     virtual
+    //     returns (uint256 vestedPayout, uint256 vestingPayout, uint256 claimablePayout) 
+    // {
+    //     Bill memory bill = billInfo[_billId];
+    //     // Calculate vestedPayout
+    //     uint256 fullPayout = bill.payout;
+    //     vestedPayout_ = vestingCurve.getVestedPayoutAtTime(
+    //         fullPayout, 
+    //         bill.vestingTerm, 
+    //         bill.vestingStartTimestamp, 
+    //         _timestamp
+    //     );
+    //     // Calculate vestingPayout
+    //     vestingPayout_ = fullPayout - vestedPayout_;
+    //     // Calculate claimablePayout
+    //     uint256 payoutClaimed = bill.payoutClaimed;
+    //     claimablePayout_ = 0;
+    //     if(payoutClaimed < vestedPayout_) {
+    //         claimablePayout_ = vestedPayout_ - payoutClaimed;
+    //     }
+    // }
 
     /**
      * @dev Internal function to get the payout token of a given vesting NFT

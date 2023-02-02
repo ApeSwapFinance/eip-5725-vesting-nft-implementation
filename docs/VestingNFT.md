@@ -30,7 +30,7 @@ _tracker of current NFT id_
 ### constructor
 
 ```solidity
-constructor(string name, string symbol) public
+constructor(string name, string symbol, contract IVestingCurve vestingCurve) public
 ```
 
 _Initializes the contract by setting a `name` and a `symbol` to the token._

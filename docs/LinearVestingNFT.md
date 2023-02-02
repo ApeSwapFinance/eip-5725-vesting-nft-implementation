@@ -31,7 +31,7 @@ _tracker of current NFT id_
 ### constructor
 
 ```solidity
-constructor(string name, string symbol) public
+constructor(string name, string symbol, contract IVestingCurve vestingCurve) public
 ```
 
 _See {IERC5725}._
