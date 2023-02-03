@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.17;
 
-import "./IVestingCurve.sol";
 import "../ERC5725.sol";
+import "./IVestingCurve.sol";
 
 contract LinearVestingNFT is ERC5725 {
     using SafeERC20 for IERC20;
@@ -113,6 +113,13 @@ contract LinearVestingNFT is ERC5725 {
      */
     function _startTime(uint256 tokenId) internal view override returns (uint256) {
         return vestDetails[tokenId].startTime;
+    }
+
+    /**
+     * @dev See {ERC5725}.
+     */
+    function _vestingTerm(uint256 tokenId) internal view override returns (uint256) {
+        return vestDetails[tokenId].vestingTerm;
     }
 
     /**

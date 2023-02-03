@@ -18,11 +18,11 @@ describe('VestingNFT', function () {
   let unlockTime: number
 
   beforeEach(async function () {
-    const LinearVestingCurve = (await ethers.getContractFactory('LinearVestingCurve')) as LinearVestingCurve__factory
-    const linearVestingCurve = await LinearVestingCurve.deploy()
+    const TokenTimelockCurve = (await ethers.getContractFactory('TokenTimelockCurve')) as LinearVestingCurve__factory
+    const tokenTimelockCurve = await TokenTimelockCurve.deploy()
 
     const VestingNFT = await ethers.getContractFactory('VestingNFT')
-    vestingNFT = (await VestingNFT.deploy('VestingNFT', 'TLV')) as VestingNFT
+    vestingNFT = (await VestingNFT.deploy('VestingNFT', 'TLV', tokenTimelockCurve.address)) as VestingNFT
     // vestingNFT = await VestingNFT.deploy('VestingNFT', 'TLV', linearVestingCurve.address) as VestingNFT
     await vestingNFT.deployed()
 
@@ -109,21 +109,6 @@ describe('VestingNFT', function () {
     await expect(connectedVestingNft.claim(0)).to.revertedWith('Not owner of NFT')
   })
 
-  // NOTE: Removed claimTo from spec
-  // it("Is able to claim to other account", async function () {
-  //   const connectedVestingNft = vestingNFT.connect(accounts[1]);
-  //   const otherReceiverAddress = await accounts[2].getAddress();
-  //   await increaseTime(testValues.lockTime);
-  //   const txReceipt = await connectedVestingNft.claimTo(
-  //     0,
-  //     otherReceiverAddress
-  //   );
-  //   await txReceipt.wait();
-  //   expect(await mockToken.balanceOf(otherReceiverAddress)).to.equal(
-  //     testValues.payout
-  //   );
-  // });
-
   it('Reverts when creating to account 0', async function () {
     await expect(
       vestingNFT.create('0x0000000000000000000000000000000000000000', testValues.payout, unlockTime, mockToken.address)
@@ -133,8 +118,8 @@ describe('VestingNFT', function () {
 
 async function createVestingNft(vestingNFT: VestingNFT, receiverAccount: string, mockToken: ERC20Mock) {
   const latestBlock = await ethers.provider.getBlock('latest')
-  const unlockTime = latestBlock.timestamp + testValues.lockTime
-  const txReceipt = await vestingNFT.create(receiverAccount, testValues.payout, unlockTime, mockToken.address)
+  const unlockTime = latestBlock.timestamp + testValues.lockTime + 1
+  const txReceipt = await vestingNFT.create(receiverAccount, testValues.payout, testValues.lockTime, mockToken.address)
   await txReceipt.wait()
   return unlockTime
 }

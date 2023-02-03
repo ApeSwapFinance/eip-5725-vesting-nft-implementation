@@ -141,6 +141,14 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     function _startTime(uint256 tokenId) internal view virtual returns (uint256);
 
     /**
+     * @dev Internal function to get the vesting term of a given vesting NFT
+     *
+     * @param tokenId to check
+     * @return uint256 the vesting term in seconds
+     */
+    function _vestingTerm(uint256 tokenId) internal view virtual returns (uint256);
+
+    /**
      * @dev Internal function to get the end time of a given vesting NFT
      *
      * @param tokenId to check

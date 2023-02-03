@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "../ERC5725.sol";
+import "./IVestingCurve.sol";
 
 contract VestingNFT is ERC5725 {
     using SafeERC20 for IERC20;
@@ -10,34 +11,52 @@ contract VestingNFT is ERC5725 {
         IERC20 payoutToken; /// @dev payout token
         uint256 payout; /// @dev payout token remaining to be paid
         uint128 startTime; /// @dev when vesting starts
-        uint128 endTime; /// @dev when vesting end
+        uint128 vestingTerm; /// @dev duration of vesting schedule
     }
     mapping(uint256 => VestDetails) public vestDetails; /// @dev maps the vesting data with tokenIds
 
+    /// @dev immutable vesting release schedule
+    IVestingCurve public immutable vestingCurve;
     /// @dev tracker of current NFT id
     uint256 private _tokenIdTracker;
 
     /**
      * @dev Initializes the contract by setting a `name` and a `symbol` to the token.
      */
-    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
+    constructor(
+        string memory name_,
+        string memory symbol_,
+        IVestingCurve vestingCurve_
+    ) ERC721(name_, symbol_) {
+        (uint256 totalPayout, uint256 vestDuration, uint256 start) = (1e18, 1000, 1000);
+        require(
+            vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, 0) == 0,
+            "before vesting must be 0"
+        );
+        require(
+            vestingCurve_.getVestedPayoutAtTime(totalPayout, vestDuration, start, vestDuration + start + 1) ==
+                totalPayout,
+            "after vesting must be totalPayout"
+        );
+        vestingCurve = vestingCurve_;
+    }
 
     /**
      * @notice Creates a new vesting NFT and mints it
      * @dev Token amount should be approved to be transferred by this contract before executing create
      * @param to The recipient of the NFT
      * @param amount The total assets to be locked over time
-     * @param releaseTimestamp When the full amount of tokens get released
+     * @param vestingTerm When the full amount of tokens get released
      * @param token The ERC20 token to vest over time
      */
     function create(
         address to,
         uint256 amount,
-        uint128 releaseTimestamp,
+        uint128 vestingTerm,
         IERC20 token
     ) public virtual {
         require(to != address(0), "to cannot be address 0");
-        require(releaseTimestamp > block.timestamp, "release must be in future");
+        require(vestingTerm > 0, "vesting term must be greater than 0");
 
         uint256 newTokenId = _tokenIdTracker;
 
@@ -45,7 +64,7 @@ contract VestingNFT is ERC5725 {
             payoutToken: token,
             payout: amount,
             startTime: uint128(block.timestamp),
-            endTime: releaseTimestamp
+            vestingTerm: vestingTerm
         });
 
         _tokenIdTracker++;
@@ -63,10 +82,14 @@ contract VestingNFT is ERC5725 {
         validToken(tokenId)
         returns (uint256 payout)
     {
-        if (timestamp >= _endTime(tokenId)) {
-            return _payout(tokenId);
-        }
-        return 0;
+        VestDetails memory tokenVestDetails = vestDetails[tokenId];
+        return
+            vestingCurve.getVestedPayoutAtTime(
+                tokenVestDetails.payout,
+                tokenVestDetails.vestingTerm,
+                tokenVestDetails.startTime,
+                timestamp
+            );
     }
 
     /**
@@ -93,7 +116,15 @@ contract VestingNFT is ERC5725 {
     /**
      * @dev See {ERC5725}.
      */
+    function _vestingTerm(uint256 tokenId) internal view override returns (uint256) {
+        return vestDetails[tokenId].vestingTerm;
+    }
+
+    /**
+     * @dev See {ERC5725}.
+     */
     function _endTime(uint256 tokenId) internal view override returns (uint256) {
-        return vestDetails[tokenId].endTime;
+        VestDetails memory tokenVestDetails = vestDetails[tokenId];
+        return tokenVestDetails.startTime + tokenVestDetails.vestingTerm;
     }
 }
