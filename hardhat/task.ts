@@ -1,10 +1,6 @@
 import fs from 'fs'
 import path, { extname } from 'path'
-import {
-  BuildInfo,
-  CompilerOutputContract,
-  HardhatRuntimeEnvironment,
-} from 'hardhat/types'
+import { BuildInfo, CompilerOutputContract, HardhatRuntimeEnvironment } from 'hardhat/types'
 import { BigNumber, Contract } from 'ethers'
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
 
@@ -36,11 +32,7 @@ export default class Task {
   _verifier?: Verifier
   _outputFile?: string
 
-  static fromHRE(
-    id: string,
-    hre: HardhatRuntimeEnvironment,
-    verifier?: Verifier
-  ): Task {
+  static fromHRE(id: string, hre: HardhatRuntimeEnvironment, verifier?: Verifier): Task {
     return new this(id, hre.network.name as Network, verifier)
   }
 
@@ -64,8 +56,7 @@ export default class Task {
   }
 
   constructor(id: string, network?: Network, verifier?: Verifier) {
-    if (network && !NETWORKS.includes(network))
-      throw Error(`Unknown network ${network}`)
+    if (network && !NETWORKS.includes(network)) throw Error(`Unknown network ${network}`)
     this.id = id
     this._network = network
     this._verifier = verifier
@@ -80,8 +71,7 @@ export default class Task {
   }
 
   get network(): Network {
-    if (!this._network)
-      throw Error('A network must be specified to define a task')
+    if (!this._network) throw Error('A network must be specified to define a task')
     return this._network
   }
 
@@ -99,14 +89,10 @@ export default class Task {
     return this.instanceAt(name, address)
   }
 
-  async inputInstance(
-    artifactName: string,
-    inputName: string
-  ): Promise<Contract> {
+  async inputInstance(artifactName: string, inputName: string): Promise<Contract> {
     const rawInput = this.rawInput()
     const input = rawInput[inputName]
-    if (!this._isTask(input))
-      throw Error(`Cannot access to non-task input ${inputName}`)
+    if (!this._isTask(input)) throw Error(`Cannot access to non-task input ${inputName}`)
     const task = input as Task
     task.network = this.network
     const address = this._parseRawInput(rawInput)[inputName]
@@ -132,12 +118,7 @@ export default class Task {
     }
   }
 
-  async deploy(
-    name: string,
-    args: Array<Param> = [],
-    from?: SignerWithAddress,
-    libs?: Libraries
-  ): Promise<Contract> {
+  async deploy(name: string, args: Array<Param> = [], from?: SignerWithAddress, libs?: Libraries): Promise<Contract> {
     const instance = await deploy(this.artifact(name), args, from, libs)
     const constructorArgs = instance.interface.encodeDeploy(args)
     this.save({
@@ -155,30 +136,17 @@ export default class Task {
     libs?: Libraries
   ): Promise<void> {
     try {
-      if (!this._verifier)
-        return logger.warn(
-          'Skipping contract verification, no verifier defined'
-        )
+      if (!this._verifier) return logger.warn('Skipping contract verification, no verifier defined')
       const deployOutput = this.output()
       if (!constructorArguments) {
-        logger.info(
-          'No constructorArguments passed for verification. Pulling from inputs.'
-        )
-        constructorArguments = stripHexPrefix(
-          deployOutput[this._keyForContractArgs(name)]
-        )
+        logger.info('No constructorArguments passed for verification. Pulling from inputs.')
+        constructorArguments = stripHexPrefix(deployOutput[this._keyForContractArgs(name)])
       }
       if (!address) {
         logger.info('No address passed for verification. Pulling from inputs.')
         address = deployOutput[name]
       }
-      const url = await this._verifier.call(
-        this,
-        name,
-        address,
-        constructorArguments,
-        libs
-      )
+      const url = await this._verifier.call(this, name, address, constructorArguments, libs)
       logger.success(`Verified contract ${name} at ${url}`)
     } catch (error) {
       logger.error(`Failed trying to verify ${name} at ${address}: ${error}`)
@@ -198,27 +166,20 @@ export default class Task {
 
   buildInfo(fileName: string): BuildInfo {
     const buildInfoDir = this._dirAt(this.dir(), 'build-info')
-    const artifactFile = this._fileAt(
-      buildInfoDir,
-      `${extname(fileName) ? fileName : `${fileName}.json`}`
-    )
+    const artifactFile = this._fileAt(buildInfoDir, `${extname(fileName) ? fileName : `${fileName}.json`}`)
     return JSON.parse(fs.readFileSync(artifactFile).toString())
   }
 
   buildInfos(): Array<BuildInfo> {
     const buildInfoDir = this._dirAt(this.dir(), 'build-info')
-    return fs
-      .readdirSync(buildInfoDir)
-      .map((fileName) => this.buildInfo(fileName))
+    return fs.readdirSync(buildInfoDir).map((fileName) => this.buildInfo(fileName))
   }
 
   artifact(contractName: string, fileName?: string): Artifact {
     const buildInfoDir = this._dirAt(this.dir(), 'build-info')
     const builds: {
       [sourceName: string]: { [contractName: string]: CompilerOutputContract }
-    } = Task._existsFile(
-      path.join(buildInfoDir, `${fileName || contractName}.json`)
-    )
+    } = Task._existsFile(path.join(buildInfoDir, `${fileName || contractName}.json`))
       ? // If build info file exists, use it
         this.buildInfo(contractName).output.contracts
       : // Otherwise pull in all build info files and reduce each contract into a single object
@@ -251,10 +212,7 @@ export default class Task {
     return this._parseRawInput(this.rawInput())
   }
 
-  output({
-    ensure = true,
-    network,
-  }: { ensure?: boolean; network?: Network } = {}): Output {
+  output({ ensure = true, network }: { ensure?: boolean; network?: Network } = {}): Output {
     if (network) this.network = network
     const taskOutputDir = this._dirAt(this.dir(), 'output', ensure)
     const taskOutputFile = this._fileAt(taskOutputDir, this.outputFile, ensure)
@@ -279,23 +237,18 @@ export default class Task {
   }
 
   private _parseRawInput(rawInput: RawInputKeyValue): Input {
-    return Object.keys(rawInput).reduce(
-      (input: Input, key: Network | string) => {
-        const item = rawInput[key]
-        if (Array.isArray(item)) input[key] = item
-        else if (BigNumber.isBigNumber(item)) input[key] = item
-        else if (typeof item !== 'object') input[key] = item
-        else {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const output: Output | any = this._isTask(item)
-            ? (item as Task).output({ network: this.network })
-            : item
-          input[key] = output[key] ? output[key] : output
-        }
-        return input
-      },
-      {}
-    )
+    return Object.keys(rawInput).reduce((input: Input, key: Network | string) => {
+      const item = rawInput[key]
+      if (Array.isArray(item)) input[key] = item
+      else if (BigNumber.isBigNumber(item)) input[key] = item
+      else if (typeof item !== 'object') input[key] = item
+      else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const output: Output | any = this._isTask(item) ? (item as Task).output({ network: this.network }) : item
+        input[key] = output[key] ? output[key] : output
+      }
+      return input
+    }, {})
   }
 
   private _parseRawOutput(rawOutput: RawOutput): Output {
@@ -307,9 +260,7 @@ export default class Task {
   }
 
   private _read(path: string): Output {
-    return fs.existsSync(path)
-      ? JSON.parse(fs.readFileSync(path).toString())
-      : {}
+    return fs.existsSync(path) ? JSON.parse(fs.readFileSync(path).toString()) : {}
   }
 
   private _write(path: string, output: Output): void {
@@ -320,15 +271,13 @@ export default class Task {
 
   private _fileAt(base: string, name: string, ensure = true): string {
     const filePath = path.join(base, name)
-    if (ensure && !Task._existsFile(filePath))
-      throw Error(`Could not find a file at ${filePath}`)
+    if (ensure && !Task._existsFile(filePath)) throw Error(`Could not find a file at ${filePath}`)
     return filePath
   }
 
   private _dirAt(base: string, name: string, ensure = true): string {
     const dirPath = path.join(base, name)
-    if (ensure && !Task._existsDir(dirPath))
-      throw Error(`Could not find a directory at ${dirPath}`)
+    if (ensure && !Task._existsDir(dirPath)) throw Error(`Could not find a directory at ${dirPath}`)
     return dirPath
   }
 

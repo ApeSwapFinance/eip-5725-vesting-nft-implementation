@@ -8,7 +8,7 @@ import {
   ERC20Mock,
   LinearVestingNFT__factory,
   LinearVestingNFT,
-  LinearVestingCurve__factory
+  LinearVestingCurve__factory,
 } from '../typechain-types'
 
 const testValues = {
@@ -26,36 +26,21 @@ describe('LinearVestingNFT', function () {
   let unlockTime: number
 
   beforeEach(async function () {
-    const LinearVestingCurve = (await ethers.getContractFactory(
-      'LinearVestingCurve'
-    )) as LinearVestingCurve__factory
-    const linearVestingCurve = await LinearVestingCurve.deploy();
-    
-    const LinearVestingNFT = (await ethers.getContractFactory(
-      'LinearVestingNFT'
-    )) as LinearVestingNFT__factory
+    const LinearVestingCurve = (await ethers.getContractFactory('LinearVestingCurve')) as LinearVestingCurve__factory
+    const linearVestingCurve = await LinearVestingCurve.deploy()
+
+    const LinearVestingNFT = (await ethers.getContractFactory('LinearVestingNFT')) as LinearVestingNFT__factory
     linearVestingNFT = await LinearVestingNFT.deploy('LinearVestingNFT', 'TLV', linearVestingCurve.address)
     await linearVestingNFT.deployed()
 
-    const ERC20Mock = (await ethers.getContractFactory(
-      'ERC20Mock'
-    )) as ERC20Mock__factory
-    mockToken = await ERC20Mock.deploy(
-      '1000000000000000000000',
-      18,
-      'LockedToken',
-      'LOCK'
-    )
+    const ERC20Mock = (await ethers.getContractFactory('ERC20Mock')) as ERC20Mock__factory
+    mockToken = await ERC20Mock.deploy('1000000000000000000000', 18, 'LockedToken', 'LOCK')
     await mockToken.deployed()
     await mockToken.approve(linearVestingNFT.address, '1000000000000000000000')
 
     accounts = await ethers.getSigners()
     receiverAccount = await accounts[1].getAddress()
-    unlockTime = await createVestingNft(
-      linearVestingNFT,
-      receiverAccount,
-      mockToken
-    )
+    unlockTime = await createVestingNft(linearVestingNFT, receiverAccount, mockToken)
   })
 
   it('Returns a valid vested payout', async function () {
@@ -81,25 +66,14 @@ describe('LinearVestingNFT', function () {
 
   it('Reverts when creating to past start date 0', async function () {
     await expect(
-      linearVestingNFT.create(
-        receiverAccount,
-        testValues.payout,
-        0,
-        testValues.lockTime,
-        mockToken.address
-      )
+      linearVestingNFT.create(receiverAccount, testValues.payout, 0, testValues.lockTime, mockToken.address)
     ).to.revertedWith('startTime cannot be on the past')
   })
 })
 
-async function createVestingNft(
-  linearVestingNFT: LinearVestingNFT,
-  receiverAccount: string,
-  mockToken: ERC20Mock
-) {
+async function createVestingNft(linearVestingNFT: LinearVestingNFT, receiverAccount: string, mockToken: ERC20Mock) {
   const latestBlock = await ethers.provider.getBlock('latest')
-  const unlockTime =
-    latestBlock.timestamp + testValues.lockTime + testValues.buffer
+  const unlockTime = latestBlock.timestamp + testValues.lockTime + testValues.buffer
   const txReceipt = await linearVestingNFT.create(
     receiverAccount,
     testValues.payout,

@@ -1,10 +1,7 @@
 import { Task, TaskRunOptions } from '../../hardhat'
 import { DeploymentInputs } from './input'
 
-export default async (
-  task: Task,
-  { force, from }: TaskRunOptions = {}
-): Promise<void> => {
+export default async (task: Task, { force, from }: TaskRunOptions = {}): Promise<void> => {
   const input = task.input() as DeploymentInputs
   // Setup and deploy LinearVestingNFT
   const linearVestingArgs = [input.token0.name, input.token0.symbol]

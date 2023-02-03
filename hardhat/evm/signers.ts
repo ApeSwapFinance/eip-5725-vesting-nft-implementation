@@ -13,9 +13,7 @@ export async function getSigners(): Promise<SignerWithAddress[]> {
   return ethers.getSigners()
 }
 
-export async function getSigner(
-  indexOrAddress: number | string = 0
-): Promise<SignerWithAddress> {
+export async function getSigner(indexOrAddress: number | string = 0): Promise<SignerWithAddress> {
   if (typeof indexOrAddress === 'string') {
     const { ethers } = await import('hardhat')
     const signer = ethers.provider.getSigner(indexOrAddress)
@@ -26,10 +24,7 @@ export async function getSigner(
   }
 }
 
-export async function impersonate(
-  address: string,
-  balance?: BigNumber
-): Promise<SignerWithAddress> {
+export async function impersonate(address: string, balance?: BigNumber): Promise<SignerWithAddress> {
   if (balance) {
     await setBalance(address, balance)
   }
@@ -37,21 +32,15 @@ export async function impersonate(
   return getSigner(address)
 }
 
-export async function impersonateWhale(
-  balance?: BigNumber
-): Promise<SignerWithAddress> {
+export async function impersonateWhale(balance?: BigNumber): Promise<SignerWithAddress> {
   const hre = await import('hardhat')
   const network = getForkedNetwork(hre)
   const address = WHALES[network]
-  if (!address)
-    throw Error(`Could not find whale address for network ${network}`)
+  if (!address) throw Error(`Could not find whale address for network ${network}`)
   return impersonate(address, balance)
 }
 
-export async function setBalance(
-  address: string,
-  balance: BigNumber
-): Promise<void> {
+export async function setBalance(address: string, balance: BigNumber): Promise<void> {
   const hre = await import('hardhat')
   await hre.network.provider.request({
     method: 'hardhat_impersonateAccount',

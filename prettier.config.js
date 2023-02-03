@@ -5,6 +5,7 @@ module.exports = {
   tabWidth: 2,
   semi: false,
   singleQuote: true,
+  printWidth: 120,
   overrides: [
     {
       // https://www.npmjs.com/package/prettier-plugin-solidity

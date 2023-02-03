@@ -18,23 +18,16 @@ describe('VestingNFT', function () {
   let unlockTime: number
 
   beforeEach(async function () {
-    const LinearVestingCurve = (await ethers.getContractFactory(
-      'LinearVestingCurve'
-    )) as LinearVestingCurve__factory
-    const linearVestingCurve = await LinearVestingCurve.deploy();
+    const LinearVestingCurve = (await ethers.getContractFactory('LinearVestingCurve')) as LinearVestingCurve__factory
+    const linearVestingCurve = await LinearVestingCurve.deploy()
 
     const VestingNFT = await ethers.getContractFactory('VestingNFT')
-    vestingNFT = await VestingNFT.deploy('VestingNFT', 'TLV') as VestingNFT
+    vestingNFT = (await VestingNFT.deploy('VestingNFT', 'TLV')) as VestingNFT
     // vestingNFT = await VestingNFT.deploy('VestingNFT', 'TLV', linearVestingCurve.address) as VestingNFT
     await vestingNFT.deployed()
 
     const ERC20Mock = await ethers.getContractFactory('ERC20Mock')
-    mockToken = await ERC20Mock.deploy(
-      '1000000000000000000000',
-      18,
-      'LockedToken',
-      'LOCK'
-    ) as ERC20Mock
+    mockToken = (await ERC20Mock.deploy('1000000000000000000000', 18, 'LockedToken', 'LOCK')) as ERC20Mock
     await mockToken.deployed()
     await mockToken.approve(vestingNFT.address, '1000000000000000000000')
 
@@ -65,27 +58,13 @@ describe('VestingNFT', function () {
   })
 
   it('Reverts with invalid ID', async function () {
-    await expect(vestingNFT.vestedPayout(1)).to.revertedWith(
-      'ERC5725: invalid token ID'
-    )
-    await expect(vestingNFT.vestedPayoutAtTime(1, unlockTime)).to.revertedWith(
-      'ERC5725: invalid token ID'
-    )
-    await expect(vestingNFT.vestingPayout(1)).to.revertedWith(
-      'ERC5725: invalid token ID'
-    )
-    await expect(vestingNFT.claimablePayout(1)).to.revertedWith(
-      'ERC5725: invalid token ID'
-    )
-    await expect(vestingNFT.vestingPeriod(1)).to.revertedWith(
-      'ERC5725: invalid token ID'
-    )
-    await expect(vestingNFT.payoutToken(1)).to.revertedWith(
-      'ERC5725: invalid token ID'
-    )
-    await expect(vestingNFT.claim(1)).to.revertedWith(
-      'ERC5725: invalid token ID'
-    )
+    await expect(vestingNFT.vestedPayout(1)).to.revertedWith('ERC5725: invalid token ID')
+    await expect(vestingNFT.vestedPayoutAtTime(1, unlockTime)).to.revertedWith('ERC5725: invalid token ID')
+    await expect(vestingNFT.vestingPayout(1)).to.revertedWith('ERC5725: invalid token ID')
+    await expect(vestingNFT.claimablePayout(1)).to.revertedWith('ERC5725: invalid token ID')
+    await expect(vestingNFT.vestingPeriod(1)).to.revertedWith('ERC5725: invalid token ID')
+    await expect(vestingNFT.payoutToken(1)).to.revertedWith('ERC5725: invalid token ID')
+    await expect(vestingNFT.claim(1)).to.revertedWith('ERC5725: invalid token ID')
     // NOTE: Removed claimTo from spec
     // await expect(vestingNFT.claimTo(1, receiverAccount)).to.revertedWith(
     //   "ERC5725: invalid token ID"
@@ -117,23 +96,17 @@ describe('VestingNFT', function () {
     await increaseTime(testValues.lockTime)
     const txReceipt = await connectedVestingNft.claim(0)
     await txReceipt.wait()
-    expect(await mockToken.balanceOf(receiverAccount)).to.equal(
-      testValues.payout
-    )
+    expect(await mockToken.balanceOf(receiverAccount)).to.equal(testValues.payout)
   })
 
   it('Reverts claim when payout is 0', async function () {
     const connectedVestingNft = vestingNFT.connect(accounts[1])
-    await expect(connectedVestingNft.claim(0)).to.revertedWith(
-      'ERC5725: No pending payout'
-    )
+    await expect(connectedVestingNft.claim(0)).to.revertedWith('ERC5725: No pending payout')
   })
 
   it('Reverts claim when payout is not from owner', async function () {
     const connectedVestingNft = vestingNFT.connect(accounts[2])
-    await expect(connectedVestingNft.claim(0)).to.revertedWith(
-      'Not owner of NFT'
-    )
+    await expect(connectedVestingNft.claim(0)).to.revertedWith('Not owner of NFT')
   })
 
   // NOTE: Removed claimTo from spec
@@ -153,29 +126,15 @@ describe('VestingNFT', function () {
 
   it('Reverts when creating to account 0', async function () {
     await expect(
-      vestingNFT.create(
-        '0x0000000000000000000000000000000000000000',
-        testValues.payout,
-        unlockTime,
-        mockToken.address
-      )
+      vestingNFT.create('0x0000000000000000000000000000000000000000', testValues.payout, unlockTime, mockToken.address)
     ).to.revertedWith('to cannot be address 0')
   })
 })
 
-async function createVestingNft(
-  vestingNFT: VestingNFT,
-  receiverAccount: string,
-  mockToken: ERC20Mock
-) {
+async function createVestingNft(vestingNFT: VestingNFT, receiverAccount: string, mockToken: ERC20Mock) {
   const latestBlock = await ethers.provider.getBlock('latest')
   const unlockTime = latestBlock.timestamp + testValues.lockTime
-  const txReceipt = await vestingNFT.create(
-    receiverAccount,
-    testValues.payout,
-    unlockTime,
-    mockToken.address
-  )
+  const txReceipt = await vestingNFT.create(receiverAccount, testValues.payout, unlockTime, mockToken.address)
   await txReceipt.wait()
   return unlockTime
 }
