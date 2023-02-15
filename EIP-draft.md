@@ -61,18 +61,18 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @title Non-Fungible Vesting Token Standard
- * @notice A non-fungible token standard used to vest tokens (EIP-20 or otherwise) over a vesting release curve
+ * @notice A non-fungible token standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve
  *  scheduled using timestamps.
  * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
  */
 interface IERC5725 is IERC721 {
     /**
-    *  This event is emitted when the payout is claimed through the claim function
-    *  @param tokenId the NFT tokenId of the assets being claimed.
-    *  @param recipient The address which is receiving the payout.
-    *  @param claimAmount The amount of tokens being claimed.
-    */
+     *  This event is emitted when the payout is claimed through the claim function
+     *  @param tokenId the NFT tokenId of the assets being claimed.
+     *  @param recipient The address which is receiving the payout.
+     *  @param claimAmount The amount of tokens being claimed.
+     */
     event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 claimAmount);
 
     /**
@@ -83,6 +83,21 @@ interface IERC5725 is IERC721 {
      * @param tokenId The NFT token id
      */
     function claim(uint256 tokenId) external;
+
+    /**
+     * @notice Number of tokens for the NFT which have been claimed
+     * @param tokenId The NFT token id
+     * @return payout The total amount of payout tokens claimed for this NFT 
+     */
+    function payoutClaimed(uint256 tokenId) external view returns (uint256 payout);
+
+    /**
+     * @notice Number of tokens for the NFT which can be claimed at the current timestamp
+     * @dev It is RECOMMENDED that this is calculated as the `vestedPayout()` subtracted from `payoutClaimed()`.
+     * @param tokenId The NFT token id
+     * @return payout The amount of unlocked payout tokens for the NFT which have not yet been claimed
+     */
+    function claimablePayout(uint256 tokenId) external view returns (uint256 payout);
 
     /**
      * @notice Total amount of tokens which have been vested at the current timestamp.
@@ -106,22 +121,12 @@ interface IERC5725 is IERC721 {
     function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp) external view returns (uint256 payout);
 
     /**
-     * @notice Number of tokens for an NFT which are currently vesting (locked).
+     * @notice Number of tokens for an NFT which are currently vesting.
      * @dev The sum of vestedPayout and vestingPayout SHOULD always be the total payout.
      * @param tokenId The NFT token id
-     * @return payout The number of tokens for the NFT which have not been claimed yet,
-     *   regardless of whether they are ready to claim
+     * @return payout The number of tokens for the NFT which are vesting until a future date.
      */
     function vestingPayout(uint256 tokenId) external view returns (uint256 payout);
-
-    /**
-     * @notice Number of tokens for the NFT which can be claimed at the current timestamp
-     * @dev It is RECOMMENDED that this is calculated as the `vestedPayout()` value with the total
-     * amount of tokens claimed subtracted.
-     * @param tokenId The NFT token id
-     * @return payout The number of vested tokens for the NFT which have not been claimed yet
-     */
-    function claimablePayout(uint256 tokenId) external view returns (uint256 payout);
 
     /**
      * @notice The start and end timestamps for the vesting of the provided NFT
@@ -148,9 +153,10 @@ interface IERC5725 is IERC721 {
 
 These are base terms used around the specification which function names and definitions are based on.
 
-- _vesting_: Tokens which are locked until a future date.
-- _vested_: Tokens which have reached their unlock date. (The usage in this specification relates to the **total** vested tokens for a given Vesting NFT.)
-- _claimable_: Amount of tokens which can be claimed at the current `timestamp`.
+- _vesting_: Tokens which a vesting NFT is vesting until a future date.
+- _vested_: Total amount of tokens a vesting NFT has vested.
+- _claimable_: Amount of vested tokens which can be unlocked.
+- _claimed_: Total amount of tokens unlocked from a vesting NFT.
 - _timestamp_: The unix `timestamp` (seconds) representation of dates used for vesting.
 
 ### Vesting Functions
@@ -177,13 +183,13 @@ Generally in Solidity development it is advised against using `block.timestamp` 
 
 The `timestamp` makes cross chain integration easy, but internally, the reference implementation keeps track of the token payout per Vesting NFT to ensure that excess tokens alloted by the vesting terms cannot be claimed.
 
-### Limitation of Scope
+### Extension Possibilities/Limitation of Scope
 
-The standard does not implement the following features:
+These feature are not supported by the standard as is, but the standard could be extended to support these more advanced features.
 
-- Vesting Curves
-- Rental
-- Beneficiary
+- **Custom Vesting Curves**: This standard intends on returning deterministic `vesting` values given NFT `tokenId` and a **timestamp** as inputs. This is intentional as it provides for flexibility in how the vesting curves work under the hood which doesn't constrain projects who intend on building a complex smart contract vesting architecture.
+- **Beneficiary**: This standard could be extended to provide for a `beneficiary` address who may `claim` unlocked tokens.
+- **NFT Rentals**: Further complex DeFi tool can be created if vesting NFTs could be rented. 
 
 This is done intentionally to keep the base standard simple. These features can and likely will be added through extensions of this standard.
 

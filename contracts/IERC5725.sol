@@ -28,6 +28,21 @@ interface IERC5725 is IERC721 {
     function claim(uint256 tokenId) external;
 
     /**
+     * @notice Number of tokens for the NFT which have been claimed
+     * @param tokenId The NFT token id
+     * @return payout The total amount of payout tokens claimed for this NFT 
+     */
+    function payoutClaimed(uint256 tokenId) external view returns (uint256 payout);
+
+    /**
+     * @notice Number of tokens for the NFT which can be claimed at the current timestamp
+     * @dev It is RECOMMENDED that this is calculated as the `vestedPayout()` subtracted from `payoutClaimed()`.
+     * @param tokenId The NFT token id
+     * @return payout The amount of unlocked payout tokens for the NFT which have not yet been claimed
+     */
+    function claimablePayout(uint256 tokenId) external view returns (uint256 payout);
+
+    /**
      * @notice Total amount of tokens which have been vested at the current timestamp.
      *   This number also includes vested tokens which have been claimed.
      * @dev It is RECOMMENDED that this function calls `vestedPayoutAtTime` with
@@ -49,22 +64,12 @@ interface IERC5725 is IERC721 {
     function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp) external view returns (uint256 payout);
 
     /**
-     * @notice Number of tokens for an NFT which are currently vesting (locked).
+     * @notice Number of tokens for an NFT which are currently vesting.
      * @dev The sum of vestedPayout and vestingPayout SHOULD always be the total payout.
      * @param tokenId The NFT token id
-     * @return payout The number of tokens for the NFT which have not been claimed yet,
-     *   regardless of whether they are ready to claim
+     * @return payout The number of tokens for the NFT which are vesting until a future date.
      */
     function vestingPayout(uint256 tokenId) external view returns (uint256 payout);
-
-    /**
-     * @notice Number of tokens for the NFT which can be claimed at the current timestamp
-     * @dev It is RECOMMENDED that this is calculated as the `vestedPayout()` value with the total
-     * amount of tokens claimed subtracted.
-     * @param tokenId The NFT token id
-     * @return payout The number of vested tokens for the NFT which have not been claimed yet
-     */
-    function claimablePayout(uint256 tokenId) external view returns (uint256 payout);
 
     /**
      * @notice The start and end timestamps for the vesting of the provided NFT
