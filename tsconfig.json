@@ -15,16 +15,16 @@
     "index.ts",
     "artifacts/**/*.json",
     "src",
-    "typechain-types"
+    "typechain-types",
+    "test",
+    "hardhat.config.ts",
   ],
   // The intent here is to only include src/ and Smart Contract artifacts and types.
   "exclude": [
     "dist",
     "hardhat",
     "tasks",
-    "test",
     "scripts",
-    "hardhat.config.ts",
     "prettier.config.js",
     "solhint.config.js"
   ]

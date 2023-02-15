@@ -24,7 +24,8 @@
     "lint:ts:fix": "prettier --write ./{scripts,tasks,src,hardhat,test}/**/*.ts",
     "lint:ci": "yarn lint",
     "list:networks": "hardhat verify --list-networks",
-    "clean": "node ./hardhat/utils/clean.js"
+    "clean": "node ./hardhat/utils/clean.js",
+    "precommit": "yarn lint:ci && yarn test:ci && yarn gen:docs"
   },
   "repository": {
     "type": "git",
