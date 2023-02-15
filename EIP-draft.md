@@ -61,7 +61,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @title Non-Fungible Vesting Token Standard
- * @notice A non-fungible token standard used to vest tokens (EIP-20 or otherwise) over a vesting release curve
+ * @notice A non-fungible token standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve
  *  scheduled using timestamps.
  * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
@@ -79,17 +79,18 @@ interface IERC5725 is IERC721 {
      * @notice Claim the pending payout for the NFT
      * @dev MUST grant the claimablePayout value at the time of claim being called
      * MUST revert if not called by the token owner or approved users
+     * MUST emit PayoutClaimed
      * SHOULD revert if there is nothing to claim
      * @param tokenId The NFT token id
      */
     function claim(uint256 tokenId) external;
 
     /**
-     * @notice Number of tokens for the NFT which have been claimed
+     * @notice Number of tokens for the NFT which have been claimed at the current timestamp
      * @param tokenId The NFT token id
      * @return payout The total amount of payout tokens claimed for this NFT 
      */
-    function payoutClaimed(uint256 tokenId) external view returns (uint256 payout);
+    function claimedPayout(uint256 tokenId) external view returns (uint256 payout);
 
     /**
      * @notice Number of tokens for the NFT which can be claimed at the current timestamp
@@ -165,15 +166,23 @@ These are base terms used around the specification which function names and defi
 
 `vestingPayout(uint256 tokenId)` and `vestedPayout(uint256 tokenId)` add up to the total number of tokens which can be claimed by the end of of the vesting schedule. This is also equal to `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` with `type(uint256).max` as the `timestamp`.  
 
-The rationale for this is to guarantee that the tokens `vested` and tokens `vesting` are always in sync. The intent is that the vesting curves created are deterministic across the `vestingPeriod`.  
+The rationale for this is to guarantee that the tokens `vested` and tokens `vesting` are always in sync. The intent is that the vesting curves created are deterministic across the `vestingPeriod`. This creates useful opportunities for integration with these NFTs. For example: A vesting schedule can be iterated through and a vesting curve could be visualized, either on-chain or off-chain. 
 
 
-**`vestedPayout` vs `claimablePayout`**
+**`vestedPayout` vs `claimedPayout` & `claimablePayout`**
 
-- `vestedPayout(uint256 tokenId)` will provide the total amount of tokens which are eligible for release **including claimed tokens**.
-- `claimablePayout(uint256 tokenId)` provides the amount of tokens which can be claimed at the current `timestamp`.
+```solidity
+vestedPayout - claimedPayout - claimablePayout = lockedPayout
+```
 
-The rationale for providing two functions is so that the return of `vestedPayout(uint256 tokenId)` will always match the return of `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` with `block.timestamp` as the `timestamp`, and a separate function can be called to read how many tokens are available to claim.  
+- `vestedPayout(uint256 tokenId)` provides the total amount of payout tokens which have **vested** _including `claimedPayout(uint256 tokenId)`_.
+- `claimedPayout(uint256 tokenId)` provides the total amount of payout tokens which have been unlocked at the current `timestamp`.
+- `claimablePayout(uint256 tokenId)` provides the amount of payout tokens which can be unlocked at the current `timestamp`.
+
+The rationale for providing three functions is to support a number of features:
+1. The return of `vestedPayout(uint256 tokenId)` will always match the return of `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` with `block.timestamp` as the `timestamp`.
+2. `claimablePayout(uint256 tokenId)` can be used to easily see the current payout unlock amount and allow for unlock cliffs by returning zero until a `timestamp` has been passed.
+3. `claimedPayout(uint256 tokenId)` is helpful to see tokens unlocked from an NFT and it is also necessary for the calculation of vested-but-locked payout tokens: `vestedPayout - claimedPayout - claimablePayout = lockedPayout`. This would depend on how the vesting curves are configured by the an implementation of this standard.
 
 `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` provides functionality to iterate through the `vestingPeriod(uint256 tokenId)` and provide a visual of the release curve. The intent is that release curves are created which makes `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)` deterministic.  
 
@@ -183,7 +192,11 @@ Generally in Solidity development it is advised against using `block.timestamp` 
 
 The `timestamp` makes cross chain integration easy, but internally, the reference implementation keeps track of the token payout per Vesting NFT to ensure that excess tokens alloted by the vesting terms cannot be claimed.
 
-### Extension Possibilities/Limitation of Scope
+### Limitation of Scope
+
+- **Historical claims**: While historical vesting schedules can be determined on-chain with `vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)`, historical claims would need to be calculated through historical transaction data. Most likely querying for `PayoutClaimed` events to build a historical graph. 
+
+### Extension Possibilities
 
 These feature are not supported by the standard as is, but the standard could be extended to support these more advanced features.
 

@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
  * @title Non-Fungible Vesting Token Standard
- * @notice A non-fungible token standard used to vest tokens (ERC-20 or otherwise) over a vesting release curve
+ * @notice A non-fungible token standard used to vest tokens (EIP-20 or otherwise) over a vesting release curve
  *  scheduled using timestamps.
  * @dev Because this standard relies on timestamps for the vesting schedule, it's important to keep track of the
  *  tokens claimed per Vesting NFT so that a user cannot withdraw more tokens than alloted for a specific Vesting NFT.
@@ -22,17 +22,18 @@ interface IERC5725 is IERC721 {
      * @notice Claim the pending payout for the NFT
      * @dev MUST grant the claimablePayout value at the time of claim being called
      * MUST revert if not called by the token owner or approved users
+     * MUST emit PayoutClaimed
      * SHOULD revert if there is nothing to claim
      * @param tokenId The NFT token id
      */
     function claim(uint256 tokenId) external;
 
     /**
-     * @notice Number of tokens for the NFT which have been claimed
+     * @notice Number of tokens for the NFT which have been claimed at the current timestamp
      * @param tokenId The NFT token id
      * @return payout The total amount of payout tokens claimed for this NFT 
      */
-    function payoutClaimed(uint256 tokenId) external view returns (uint256 payout);
+    function claimedPayout(uint256 tokenId) external view returns (uint256 payout);
 
     /**
      * @notice Number of tokens for the NFT which can be claimed at the current timestamp
