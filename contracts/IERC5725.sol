@@ -31,7 +31,7 @@ interface IERC5725 is IERC721 {
     /**
      * @notice Number of tokens for the NFT which have been claimed at the current timestamp
      * @param tokenId The NFT token id
-     * @return payout The total amount of payout tokens claimed for this NFT 
+     * @return payout The total amount of payout tokens claimed for this NFT
      */
     function claimedPayout(uint256 tokenId) external view returns (uint256 payout);
 
