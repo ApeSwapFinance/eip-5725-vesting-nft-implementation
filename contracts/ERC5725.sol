@@ -84,6 +84,19 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
+    function claimedPayout(uint256 tokenId)
+        public
+        view
+        override(IERC5725)
+        validToken(tokenId)
+        returns (uint256 payout)
+    {
+        return _payoutClaimed[tokenId];
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
     function vestingPeriod(uint256 tokenId)
         public
         view
@@ -103,7 +116,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
 
     /**
      * @dev See {IERC165-supportsInterface}.
-     * IERC5725 interfaceId = 0xf8600f8b
+     * IERC5725 interfaceId = 0x7c89676d
      */
     function supportsInterface(bytes4 interfaceId)
         public
