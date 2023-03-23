@@ -12,8 +12,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     using SafeERC20 for IERC20;
 
     /// @dev mapping for claimed payouts
-    mapping(uint256 => uint256) /*tokenId*/ /*claimed*/
-        internal _payoutClaimed;
+    mapping(uint256 => uint256) /*tokenId*/ /*claimed*/ internal _payoutClaimed;
 
     /**
      * @notice Checks if the tokenId exists and its valid
@@ -48,62 +47,44 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function vestedPayoutAtTime(uint256 tokenId, uint256 timestamp)
-        public
-        view
-        virtual
-        override(IERC5725)
-        returns (uint256 payout);
+    function vestedPayoutAtTime(
+        uint256 tokenId,
+        uint256 timestamp
+    ) public view virtual override(IERC5725) returns (uint256 payout);
 
     /**
      * @dev See {IERC5725}.
      */
-    function vestingPayout(uint256 tokenId)
-        public
-        view
-        override(IERC5725)
-        validToken(tokenId)
-        returns (uint256 payout)
-    {
+    function vestingPayout(
+        uint256 tokenId
+    ) public view override(IERC5725) validToken(tokenId) returns (uint256 payout) {
         return _payout(tokenId) - vestedPayout(tokenId);
     }
 
     /**
      * @dev See {IERC5725}.
      */
-    function claimablePayout(uint256 tokenId)
-        public
-        view
-        override(IERC5725)
-        validToken(tokenId)
-        returns (uint256 payout)
-    {
+    function claimablePayout(
+        uint256 tokenId
+    ) public view override(IERC5725) validToken(tokenId) returns (uint256 payout) {
         return vestedPayout(tokenId) - _payoutClaimed[tokenId];
     }
 
     /**
      * @dev See {IERC5725}.
      */
-    function claimedPayout(uint256 tokenId)
-        public
-        view
-        override(IERC5725)
-        validToken(tokenId)
-        returns (uint256 payout)
-    {
+    function claimedPayout(
+        uint256 tokenId
+    ) public view override(IERC5725) validToken(tokenId) returns (uint256 payout) {
         return _payoutClaimed[tokenId];
     }
 
     /**
      * @dev See {IERC5725}.
      */
-    function vestingPeriod(uint256 tokenId)
-        public
-        view
-        override(IERC5725)
-        validToken(tokenId)
-        returns (uint256 vestingStart, uint256 vestingEnd)
-    {
+    function vestingPeriod(
+        uint256 tokenId
+    ) public view override(IERC5725) validToken(tokenId) returns (uint256 vestingStart, uint256 vestingEnd) {
         return (_startTime(tokenId), _endTime(tokenId));
     }
 
@@ -118,13 +99,9 @@ abstract contract ERC5725 is IERC5725, ERC721 {
      * @dev See {IERC165-supportsInterface}.
      * IERC5725 interfaceId = 0x7c89676d
      */
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC721, IERC165)
-        returns (bool supported)
-    {
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(ERC721, IERC165) returns (bool supported) {
         return interfaceId == type(IERC5725).interfaceId || super.supportsInterface(interfaceId);
     }
 
