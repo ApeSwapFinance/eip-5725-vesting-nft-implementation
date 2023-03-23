@@ -14,8 +14,8 @@ Find the official [EIP located here](https://eips.ethereum.org/EIPS/eip-5725).
 - `yarn`
 - Copy [.env.example](./.env.example) and rename to `.env`
   - Provide the necessary `env` variables before deployment/verification
-  - `_MNEMONIC` for deployments
-  - `_API_KEY` for verifications
+  - `MAINNET_MNEMONIC`/`TESTNET_MNEMONIC` for deployments
+  - `<explorer>_API_KEY` for verifications
 - [hardhat.config.ts](./hardhat.config.ts): Can be configured with additional networks if needed
 
 ## Deployment and Verification
