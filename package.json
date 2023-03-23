@@ -20,7 +20,7 @@
     "lint:fix": "yarn lint:sol:fix && yarn lint:ts:fix",
     "lint:sol": "solhint 'contracts/**/*.sol' && prettier --check 'contracts/**/*.sol'",
     "lint:sol:fix": "prettier --write 'contracts/**/*.sol'",
-    "lint:ts": "prettier --check ./{scripts,tasks,src,hardhat,test}/**/*.ts",
+    "lint:ts": "prettier --check ./{scripts,tasks,src,test}/**/*.ts",
     "lint:ts:fix": "prettier --write ./{scripts,tasks,src,hardhat,test}/**/*.ts",
     "lint:ci": "yarn lint",
     "list:networks": "hardhat verify --list-networks",
