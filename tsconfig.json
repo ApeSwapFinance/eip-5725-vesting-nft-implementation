@@ -17,12 +17,12 @@
     "src",
     "typechain-types",
     "test",
+    "hardhat",
     "hardhat.config.ts",
   ],
   // The intent here is to only include src/ and Smart Contract artifacts and types.
   "exclude": [
     "dist",
-    "hardhat",
     "tasks",
     "scripts",
     "prettier.config.js",
