@@ -1,10 +1,9 @@
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
 import { expect } from 'chai'
-import { time } from "@nomicfoundation/hardhat-network-helpers"
+import { time } from '@nomicfoundation/hardhat-network-helpers'
 // typechain
 import { ERC20Mock, VestingNFT } from '../typechain-types'
-
 
 const testValues = {
   payout: '1000000000',

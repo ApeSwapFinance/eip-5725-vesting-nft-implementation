@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "yarn compile",
+    "precommit": "yarn compile && yarn test && yarn lint:fix",
     "prebuild": "yarn audit && yarn compile && yarn lint:sol && yarn clean ./dist",
     "build": "tsc",
     "precompile": "yarn clean ./artifacts",
@@ -24,8 +25,7 @@
     "lint:ts:fix": "prettier --write ./{scripts,tasks,src,hardhat,test}/**/*.ts",
     "lint:ci": "yarn lint",
     "list:networks": "hardhat verify --list-networks",
-    "clean": "node ./hardhat/utils/clean.js",
-    "precommit": "yarn lint:ci && yarn test:ci && yarn gen:docs"
+    "clean": "node ./hardhat/utils/clean.js"
   },
   "repository": {
     "type": "git",

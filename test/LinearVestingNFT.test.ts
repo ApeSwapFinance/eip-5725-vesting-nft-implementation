@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
 import { expect } from 'chai'
-import { time } from "@nomicfoundation/hardhat-network-helpers"
+import { time } from '@nomicfoundation/hardhat-network-helpers'
 // typechain
 import {
   ERC20Mock__factory,
