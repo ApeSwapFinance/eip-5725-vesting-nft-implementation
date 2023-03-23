@@ -22,22 +22,22 @@ Find the official [EIP located here](https://eips.ethereum.org/EIPS/eip-5725).
 This project uses special tasks, adapted from Balancer protocol, to deploy and verify contracts which provides methods for saving custom outputs and easily verifying contracts as well as compartmentalizing different types of deployments.
 
 ### Default (yarn script) Deployment and Verification
-Deploy [20220914-vesting-nft](./tasks/20220914-vesting-nft/) task to the network of your choice  
+Deploy [20230212-vesting-nft](./tasks/20230212-vesting-nft/) task to the network of your choice  
 `yarn deploy <network-name>`  
 
 <br>
 
-Verify [20220914-vesting-nft](./tasks/20220914-vesting-nft/) on the network of your choice  
+Verify [20230212-vesting-nft](./tasks/20230212-vesting-nft/) on the network of your choice  
 `yarn verify <network-name> --name <LinearVestingNFT|VestingNFT>`  
 
 ### Hardhat Deployment and Verification
 Deploy using hardhat tasks  
-`npx hardhat deploy --id 20220914-vesting-nft --network <network-name>`  
+`npx hardhat deploy --id 20230212-vesting-nft --network <network-name>`  
 
 <br>
 
 Verify using hardhat tasks  
-`npx hardhat verify-contract --id 20220914-vesting-nft --network <network-name> --name <LinearVestingNFT|VestingNFT>`   
+`npx hardhat verify-contract --id 20230212-vesting-nft --network <network-name> --name <LinearVestingNFT|VestingNFT>`   
 
 
 ## Linting
