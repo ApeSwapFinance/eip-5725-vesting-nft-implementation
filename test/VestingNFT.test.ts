@@ -1,9 +1,10 @@
 import { ethers } from 'hardhat'
 import { Signer } from 'ethers'
 import { expect } from 'chai'
-import { increaseTime } from './helpers/time'
+import { time } from "@nomicfoundation/hardhat-network-helpers"
 // typechain
 import { ERC20Mock, VestingNFT } from '../typechain-types'
+
 
 const testValues = {
   payout: '1000000000',
@@ -54,7 +55,7 @@ describe('VestingNFT', function () {
   it('Returns a valid vested payout', async function () {
     const totalPayout = await vestingNFT.vestedPayoutAtTime(0, unlockTime)
     expect(await vestingNFT.vestedPayout(0)).to.equal(0)
-    await increaseTime(testValues.lockTime)
+    await time.increase(testValues.lockTime)
     expect(await vestingNFT.vestedPayout(0)).to.equal(totalPayout)
   })
 
@@ -93,7 +94,7 @@ describe('VestingNFT', function () {
   it('Returns a valid releasable payout', async function () {
     const totalPayout = await vestingNFT.vestedPayoutAtTime(0, unlockTime)
     expect(await vestingNFT.claimablePayout(0)).to.equal(0)
-    await increaseTime(testValues.lockTime)
+    await time.increase(testValues.lockTime)
     expect(await vestingNFT.claimablePayout(0)).to.equal(totalPayout)
   })
 
@@ -108,7 +109,7 @@ describe('VestingNFT', function () {
 
   it('Is able to claim', async function () {
     const connectedVestingNft = vestingNFT.connect(accounts[1])
-    await increaseTime(testValues.lockTime)
+    await time.increase(testValues.lockTime)
     const txReceipt = await connectedVestingNft.claim(0)
     await txReceipt.wait()
     expect(await mockToken.balanceOf(receiverAccount)).to.equal(
