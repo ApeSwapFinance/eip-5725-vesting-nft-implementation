@@ -11,7 +11,6 @@
     "dist/artifacts/**/*"
   ],
   "scripts": {
-    "postinstall": "yarn compile",
     "precommit": "yarn compile && yarn test && yarn lint:fix",
     "prebuild": "yarn compile && yarn lint:sol && yarn clean ./dist",
     "build": "tsc",
