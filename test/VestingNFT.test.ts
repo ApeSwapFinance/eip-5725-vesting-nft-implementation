@@ -50,7 +50,9 @@ describe('VestingNFT', function () {
      * const interfaceId = await vestingNFT.IID_ITEST();
      */
     // Vesting NFT Interface ID
-    expect(await vestingNFT.supportsInterface(IERC5725_InterfaceId)).to.equal(true)
+    expect(await vestingNFT.supportsInterface(IERC5725_InterfaceId)).to.equal(
+      true
+    )
   })
 
   it('Returns a valid vested payout', async function () {
