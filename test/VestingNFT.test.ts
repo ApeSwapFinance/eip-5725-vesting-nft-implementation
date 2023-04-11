@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { time } from '@nomicfoundation/hardhat-network-helpers'
 // typechain
 import { ERC20Mock, VestingNFT } from '../typechain-types'
+import { IERC5725_InterfaceId } from '../src/erc5725'
 
 const testValues = {
   payout: '1000000000',
@@ -38,6 +39,7 @@ describe('VestingNFT', function () {
   })
 
   it('Supports ERC721 and IERC5725 interfaces', async function () {
+    // ERC721
     expect(await vestingNFT.supportsInterface('0x80ac58cd')).to.equal(true)
 
     /**
@@ -48,7 +50,7 @@ describe('VestingNFT', function () {
      * const interfaceId = await vestingNFT.IID_ITEST();
      */
     // Vesting NFT Interface ID
-    expect(await vestingNFT.supportsInterface('0x7c89676d')).to.equal(true)
+    expect(await vestingNFT.supportsInterface(IERC5725_InterfaceId)).to.equal(true)
   })
 
   it('Returns a valid vested payout', async function () {
