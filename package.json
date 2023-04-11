@@ -2,13 +2,21 @@
   "name": "@ape.swap/eip-5725-vesting-nft",
   "version": "0.0.3",
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "files": [
+    "dist/index.js",
+    "dist/index.d.ts",
+    "dist/src/**/*",
+    "dist/typechain-types/**/*",
+    "dist/artifacts/**/*"
+  ],
   "scripts": {
     "postinstall": "yarn compile",
     "precommit": "yarn compile && yarn test && yarn lint:fix",
-    "prebuild": "yarn audit && yarn compile && yarn lint:sol && yarn clean ./dist",
+    "prebuild": "yarn compile && yarn lint:sol && yarn clean ./dist",
     "build": "tsc",
     "precompile": "yarn clean ./artifacts",
+    "prepublishOnly": "yarn audit",
     "compile": "hardhat compile",
     "gen:docs": "hardhat docgen",
     "deploy": "hardhat deploy --id 20230212-vesting-nft --network",
