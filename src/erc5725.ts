@@ -17,6 +17,15 @@ export function getERC5725Contract(address: string, signerOrProvider?: ethers.Si
 }
 
 /**
+ * This function returns the interface object for the ERC5725 contract.
+ * @returns The interface object for the ERC5725 contract.
+ */
+export function getERC5725Interface() {
+    // Create a new instance of the ethers.utils.Interface class with the ABI of the ERC5725 contract.
+    return new ethers.utils.Interface(ERC5725_Artifact.abi);
+}
+
+/**
  * This async function checks whether a given contract at a specified address supports the IERC5725 interface.
  * @param address The EVM address of the contract to check.
  * @param signerOrProvider The signer or provider to use for sending transactions to the contract.
