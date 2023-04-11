@@ -1,6 +1,6 @@
 {
   "name": "@ape.swap/erc-5725",
-  "version": "0.0.4-alpha.2",
+  "version": "0.0.4",
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
   "main": "dist/index.js",
   "files": [
@@ -15,7 +15,7 @@
     "prebuild": "yarn compile && yarn lint:sol && yarn clean ./dist",
     "build": "tsc",
     "precompile": "yarn clean ./artifacts",
-    "prepublishOnly": "yarn audit",
+    "_prepublishOnly": "yarn audit",
     "compile": "hardhat compile",
     "gen:docs": "hardhat docgen",
     "deploy": "hardhat deploy --id 20230212-vesting-nft --network",
