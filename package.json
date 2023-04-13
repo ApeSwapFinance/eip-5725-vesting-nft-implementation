@@ -9,8 +9,8 @@
     "dist/index.d.ts",
     "dist/src/**/*",
     "dist/typechain-types/**/*",
-    "artifacts/contracts/ERC5725.sol/ERC5725.json",
-    "artifacts/contracts/IERC5725.sol/IERC5725.json",
+    "dist/artifacts/contracts/ERC5725.sol/ERC5725.json",
+    "dist/artifacts/contracts/IERC5725.sol/IERC5725.json",
     "contracts/ERC5725.sol",
     "contracts/IERC5725.sol"
   ],
