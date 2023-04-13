@@ -42,5 +42,5 @@ export async function supportsIERC5725(
   signerOrProvider: ethers.Signer | ethers.providers.Provider
 ) {
   const contract = getERC5725Contract(address, signerOrProvider)
-  await contract.supportsInterface(IERC5725_InterfaceId)
+  return await contract.supportsInterface(IERC5725_InterfaceId)
 }
