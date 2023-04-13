@@ -4,6 +4,7 @@
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
   "main": "dist/index.js",
   "files": [
+    "README.md",
     "dist/index.js",
     "dist/index.d.ts",
     "dist/src/**/*",
