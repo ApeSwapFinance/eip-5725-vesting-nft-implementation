@@ -8,7 +8,10 @@
     "dist/index.d.ts",
     "dist/src/**/*",
     "dist/typechain-types/**/*",
-    "dist/artifacts/**/*"
+    "artifacts/contracts/ERC5725.sol/ERC5725.json",
+    "artifacts/contracts/IERC5725.sol/IERC5725.json",
+    "contracts/ERC5725.sol",
+    "contracts/IERC5725.sol"
   ],
   "scripts": {
     "precommit": "yarn compile && yarn test && yarn lint:fix",
