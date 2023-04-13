@@ -32,7 +32,8 @@
     "lint:ts:fix": "prettier --write ./{scripts,tasks,src,hardhat,test}/**/*.ts",
     "lint:ci": "yarn lint",
     "list:networks": "hardhat verify --list-networks",
-    "clean": "node ./hardhat/utils/clean.js"
+    "clean": "node ./hardhat/utils/clean.js",
+    "example": "ts-node ./examples/getVestingPeriod"
   },
   "repository": {
     "type": "git",
