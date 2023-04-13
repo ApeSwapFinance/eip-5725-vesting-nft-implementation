@@ -1,4 +1,4 @@
-import { ethers } from 'ethers'
+import { Contract, Signer, providers, utils } from 'ethers'
 import ERC5725_Artifact from '../artifacts/contracts/ERC5725.sol/ERC5725.json'
 import { ERC5725 } from '../typechain-types'
 
@@ -13,9 +13,9 @@ export const IERC5725_InterfaceId = '0x7c89676d'
  */
 export function getERC5725Contract(
   address: string,
-  signerOrProvider?: ethers.Signer | ethers.providers.Provider
+  signerOrProvider?: Signer | providers.Provider
 ) {
-  return new ethers.Contract(
+  return new Contract(
     address,
     ERC5725_Artifact.abi,
     signerOrProvider
@@ -27,8 +27,8 @@ export function getERC5725Contract(
  * @returns The interface object for the ERC5725 contract.
  */
 export function getERC5725Interface() {
-  // Create a new instance of the ethers.utils.Interface class with the ABI of the ERC5725 contract.
-  return new ethers.utils.Interface(ERC5725_Artifact.abi)
+  // Create a new instance of the utils.Interface class with the ABI of the ERC5725 contract.
+  return new utils.Interface(ERC5725_Artifact.abi)
 }
 
 /**
@@ -39,7 +39,7 @@ export function getERC5725Interface() {
  */
 export async function supportsIERC5725(
   address: string,
-  signerOrProvider: ethers.Signer | ethers.providers.Provider
+  signerOrProvider: Signer | providers.Provider
 ) {
   const contract = getERC5725Contract(address, signerOrProvider)
   return await contract.supportsInterface(IERC5725_InterfaceId)
