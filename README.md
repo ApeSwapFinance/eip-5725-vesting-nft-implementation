@@ -46,12 +46,36 @@ contract LinearVestingNFT is ERC5725 { ... }
 
 Quickly interact with an ERC5725 contract by providing an `ethers` provider.
 
+#### Quickly Read ERC-5725 Values
+
+By simply passing an RPC provider URL, state from an ERC-5725 contract can be read quickly.
+
 ```ts
 import { getERC5725Contract } from '../src'
-import { ethers } from 'ethers';
+import { ethers } from 'ethers'
 // Very quickly send txs to/read from type safe ERC-5725 contract
-const provider = await ethers.getDefaultProvider('https://bscrpc.com');
-const erc5725Contract = getERC5725Contract('0x<erc-5725-address>', provider);
+const provider = await ethers.getDefaultProvider('https://bscrpc.com')
+const erc5725Contract = getERC5725Contract('<erc-5725-address>', provider)
+// Read vestingPeriod 
+const { vestingStart, vestingEnd } = await erc5725Contract.vestingPeriod('<token-id>') 
+```
+
+#### MetaMask Integration
+
+By simply passing an RPC provider URL, state from an ERC-5725 contract can be read quickly.
+
+```ts
+import { getERC5725Contract } from '../src'
+import { ethers } from 'ethers'
+// Pull out the injected ethereum provider from MetaMask in browser
+const { ethereum } = window
+const provider = new ethers.providers.Web3Provider(ethereum)
+const signer = provider.getSigner()
+// Setup ERC-5725 instance with a signer
+const erc5725Contract = getERC5725Contract('<erc-5725-address>', signer)
+// Claim payoutTokens
+const tx = await erc5725Contract.claim(CONFIG.tokenId)
+await tx.wait()
 ```
 
 ## Usage via Clone
