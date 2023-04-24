@@ -51,10 +51,13 @@ Quickly interact with an ERC5725 contract by providing an `ethers` provider.
 By simply passing an RPC provider URL, state from an ERC-5725 contract can be read quickly.
 
 ```ts
-import { getERC5725Contract } from '@ape.swap/erc-5725'
+// Import ERC-5725 contract helper function
+import { getERC5725Contract, IERC5725_Artifact } from '@ape.swap/erc-5725'
+const IERC5725_ABI = IERC5725_Artifact.abi
 import { ethers } from 'ethers'
 // Very quickly send txs to/read from type safe ERC-5725 contract
 const provider = await ethers.getDefaultProvider('https://bscrpc.com')
+// Obtain a type safe ERC-7525 contract
 const erc5725Contract = getERC5725Contract('<erc-5725-address>', provider)
 // Read vestingPeriod 
 const { vestingStart, vestingEnd } = await erc5725Contract.vestingPeriod('<token-id>') 
@@ -65,7 +68,9 @@ const { vestingStart, vestingEnd } = await erc5725Contract.vestingPeriod('<token
 By simply passing an RPC provider URL, state from an ERC-5725 contract can be read quickly.
 
 ```ts
-import { getERC5725Contract } from '@ape.swap/erc-5725'
+// Import ERC-5725 contract helper function
+import { getERC5725Contract, IERC5725_Artifact } from '@ape.swap/erc-5725'
+const IERC5725_ABI = IERC5725_Artifact.abi
 import { ethers } from 'ethers'
 // Pull out the injected ethereum provider from MetaMask in browser
 const { ethereum } = window
@@ -74,7 +79,7 @@ const signer = provider.getSigner()
 // Setup ERC-5725 instance with a signer
 const erc5725Contract = getERC5725Contract('<erc-5725-address>', signer)
 // Claim payoutTokens
-const tx = await erc5725Contract.claim(CONFIG.tokenId)
+const tx = await erc5725Contract.claim('<token-id>')
 await tx.wait()
 ```
 
