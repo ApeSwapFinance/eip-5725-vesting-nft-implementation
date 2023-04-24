@@ -51,7 +51,7 @@ Quickly interact with an ERC5725 contract by providing an `ethers` provider.
 By simply passing an RPC provider URL, state from an ERC-5725 contract can be read quickly.
 
 ```ts
-import { getERC5725Contract } from '../src'
+import { getERC5725Contract } from '@ape.swap/erc-5725'
 import { ethers } from 'ethers'
 // Very quickly send txs to/read from type safe ERC-5725 contract
 const provider = await ethers.getDefaultProvider('https://bscrpc.com')
@@ -65,7 +65,7 @@ const { vestingStart, vestingEnd } = await erc5725Contract.vestingPeriod('<token
 By simply passing an RPC provider URL, state from an ERC-5725 contract can be read quickly.
 
 ```ts
-import { getERC5725Contract } from '../src'
+import { getERC5725Contract } from '@ape.swap/erc-5725'
 import { ethers } from 'ethers'
 // Pull out the injected ethereum provider from MetaMask in browser
 const { ethereum } = window
