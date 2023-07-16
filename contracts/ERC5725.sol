@@ -14,6 +14,9 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /// @dev mapping for claimed payouts
     mapping(uint256 => uint256) /*tokenId*/ /*claimed*/ internal _payoutClaimed;
 
+    /// @dev mapping for allowances
+    mapping(address => mapping(address => uint256)) /*address*/ /*(spender, amount)*/ internal _allowances;
+
     /**
      * @notice Checks if the tokenId exists and its valid
      * @param tokenId The NFT token id
@@ -27,9 +30,19 @@ abstract contract ERC5725 is IERC5725, ERC721 {
      * @dev See {IERC5725}.
      */
     function claim(uint256 tokenId) external override(IERC5725) validToken(tokenId) {
-        require(ownerOf(tokenId) == msg.sender, "Not owner of NFT");
+        require(
+            ownerOf(tokenId) == msg.sender ||
+                (ownerOf(tokenId) != address(0) && allowance(ownerOf(tokenId), msg.sender) > 0),
+            "ERC5725: not owner of NFT or no permission to spend"
+        );
+
         uint256 amountClaimed = claimablePayout(tokenId);
         require(amountClaimed > 0, "ERC5725: No pending payout");
+
+        // If the caller is not the owner, spend the allowance
+        if (ownerOf(tokenId) != msg.sender) {
+            _spendAllowance(ownerOf(tokenId), msg.sender, amountClaimed);
+        }
 
         emit PayoutClaimed(tokenId, msg.sender, amountClaimed);
 
@@ -96,8 +109,50 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
+     * @dev See {IERC5725}.
+     */
+    function increaseClaimAllowance(address spender, uint256 addedValue) external override(IERC5725) {
+        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
+    function decreaseClaimAllowance(address spender, uint256 subtractedValue) external override(IERC5725) {
+        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
+    function allowance(address owner, address spender) public view override(IERC5725) returns (uint256 result) {
+        return _allowances[owner][spender];
+    }
+
+    // owner cannot ever be 0x since it's sender
+    // spender maybe null
+    // value maybe 0, but wont overflow (0.8 safemaths)
+    function _setClaimAllowance(address owner, address spender, uint256 value) internal virtual {
+        if (spender == address(0)) {
+            revert("ERC5725: spender cannot be 0 address");
+        }
+        _allowances[owner][spender] = value;
+        emit ClaimApproval(owner, spender, value);
+    }
+
+    function _spendAllowance(address owner, address spender, uint256 value) internal virtual {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            if (currentAllowance < value) {
+                revert("ERC5725: insufficient allowance");
+            }
+            _allowances[owner][spender] = currentAllowance - value;
+        }
+    }
+
+    /**
      * @dev See {IERC165-supportsInterface}.
-     * IERC5725 interfaceId = 0x7c89676d
+     * IERC5725 interfaceId = 0xf316c058
      */
     function supportsInterface(
         bytes4 interfaceId
