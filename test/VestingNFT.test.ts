@@ -169,8 +169,6 @@ describe('VestingNFT', function () {
     ).to.revertedWith('to cannot be address 0')
   })
 
-  //MINE
-
   it('Owner can set a spender with an allowance that can be spent', async function () {
     // Setup allowance exactly equal to claimable amount
     const allowanceAmount = testValues.payout
@@ -284,7 +282,7 @@ describe('VestingNFT', function () {
     expect(postClaim2Allowance.toString()).to.equal((0).toString())
   })
 
-  it('Allowances set by an account aren\'t reset when NFT is transferred', async function () {
+  it("Allowances set by an account aren't reset when NFT is transferred", async function () {
     // Set an allowance for spender
     const allowanceAmount = testValues.payout
     const connectedVestingNft = vestingNFT.connect(accounts[1])
@@ -319,8 +317,6 @@ describe('VestingNFT', function () {
       allowanceAmount.toString()
     )
   })
-
-  // MINE END
 })
 
 async function createVestingNft(

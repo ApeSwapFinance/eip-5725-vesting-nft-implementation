@@ -129,27 +129,6 @@ abstract contract ERC5725 is IERC5725, ERC721 {
         return _allowances[owner][spender];
     }
 
-    // owner cannot ever be 0x since it's sender
-    // spender maybe null
-    // value maybe 0, but wont overflow (0.8 safemaths)
-    function _setClaimAllowance(address owner, address spender, uint256 value) internal virtual {
-        if (spender == address(0)) {
-            revert("ERC5725: spender cannot be 0 address");
-        }
-        _allowances[owner][spender] = value;
-        emit ClaimApproval(owner, spender, value);
-    }
-
-    function _spendAllowance(address owner, address spender, uint256 value) internal virtual {
-        uint256 currentAllowance = allowance(owner, spender);
-        if (currentAllowance != type(uint256).max) {
-            if (currentAllowance < value) {
-                revert("ERC5725: insufficient allowance");
-            }
-            _allowances[owner][spender] = currentAllowance - value;
-        }
-    }
-
     /**
      * @dev See {IERC165-supportsInterface}.
      * IERC5725 interfaceId = 0xf316c058
@@ -158,6 +137,40 @@ abstract contract ERC5725 is IERC5725, ERC721 {
         bytes4 interfaceId
     ) public view virtual override(ERC721, IERC165) returns (bool supported) {
         return interfaceId == type(IERC5725).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    /**
+     * @dev Internal function to spend a set allowance
+     *
+     * @param owner The owner of the token
+     * @param spender The spender who is permitted to spend the allowance
+     * @param value The allowance to be set for spender
+     *
+     */
+    function _setClaimAllowance(address owner, address spender, uint256 value) internal virtual {
+        if (spender == address(0)) {
+            revert("ERC5725: spender cannot be 0 address");
+        }
+        _allowances[owner][spender] = value;
+        emit ClaimApproval(owner, spender, value);
+    }
+
+    /**
+     * @dev Internal function to spend a set allowance
+     *
+     * @param owner The owner of the token
+     * @param spender The spender who is claiming the allowance
+     * @param value The allowance to be spent by spender
+     *
+     */
+    function _spendAllowance(address owner, address spender, uint256 value) internal virtual {
+        uint256 currentAllowance = allowance(owner, spender);
+        if (currentAllowance != type(uint256).max) {
+            if (currentAllowance < value) {
+                revert("ERC5725: insufficient allowance");
+            }
+            _allowances[owner][spender] = currentAllowance - value;
+        }
     }
 
     /**
