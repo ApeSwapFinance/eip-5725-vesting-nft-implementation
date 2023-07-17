@@ -37,6 +37,24 @@ interface IERC5725 is IERC721 {
     function claim(uint256 tokenId) external;
 
     /**
+     * @notice Function that allows one account to increase the allowance of another account over their tokens.
+     * @dev MUST revert if spender if the zero address.
+     * MUST emit ClaimApproval.
+     * @param spender The `spender` to be granted an allowance balance.
+     * @param addedValue The allowance granted to `spender`.
+     */
+    function increaseClaimAllowance(address spender, uint256 addedValue) external;
+
+    /**
+     * @notice Function that allows one account to decrease the allowance of another account over their tokens.
+     * @dev MUST revert if spender if the zero address.
+     * MUST emit ClaimApproval.
+     * @param spender The `spender` to have allowance balance reduced.
+     * @param subtractedValue The allowance decreased from `spender`.
+     */
+    function decreaseClaimAllowance(address spender, uint256 subtractedValue) external;
+
+    /**
      * @notice Number of tokens for the NFT which have been claimed at the current timestamp.
      * @param tokenId The NFT token id.
      * @return payout The total amount of payout tokens claimed for this NFT.
@@ -97,31 +115,10 @@ interface IERC5725 is IERC721 {
     function payoutToken(uint256 tokenId) external view returns (address token);
 
     /**
-     * @notice Atomically increases the allowance granted to `spender` by the caller.
-     * @dev `spender` cannot be the zero address.
-     * @dev Emits an {ClaimApproval} event indicating the updated allowance value.
-     * @param spender The `spender` to be granted allowance.
-     * @param addedValue The allowance granted to `spender`.
-     */
-    function increaseClaimAllowance(address spender, uint256 addedValue) external;
-    
-    /**
-     * @notice Atomically decreases the allowance granted to `spender` by the caller.
-     * @dev `spender` cannot be the zero address.
-     * @dev Emits an {ClaimApproval} event indicating the updated allowance value.
-     * @param spender The `spender` to have allowance reduced.
-     * @param subtractedValue The allowance decreased from `spender`.
-     */
-    function decreaseClaimAllowance(address spender, uint256 subtractedValue) external;
-
-    /**
-     * @notice Total amount of allowance granted to a particular `spender`.
-     * @dev `owner` cannot be the zero address.
-     * @dev `spender` cannot be the zero address.
-     * @param owner The allowance giver.
-     * @param spender The allowance sender.
-     * @return result The number of tokens permitted to be spent by the `spender`.
+     * @notice Returns the allowance that one account has given another over their token.
+     * @param owner Address that tokens are approved from.
+     * @param spender Address that tokens are approved for.
+     * @return result Allowance that one account has given another over their tokens.
      */
     function allowance(address owner, address spender) external view returns (uint256 result);
 }
-

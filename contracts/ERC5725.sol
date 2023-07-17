@@ -53,6 +53,20 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
+    function increaseClaimAllowance(address spender, uint256 addedValue) external override(IERC5725) {
+        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
+    function decreaseClaimAllowance(address spender, uint256 subtractedValue) external override(IERC5725) {
+        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
     function vestedPayout(uint256 tokenId) public view override(IERC5725) returns (uint256 payout) {
         return vestedPayoutAtTime(tokenId, block.timestamp);
     }
@@ -111,20 +125,6 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function increaseClaimAllowance(address spender, uint256 addedValue) external override(IERC5725) {
-        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
-    }
-
-    /**
-     * @dev See {IERC5725}.
-     */
-    function decreaseClaimAllowance(address spender, uint256 subtractedValue) external override(IERC5725) {
-        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
-    }
-
-    /**
-     * @dev See {IERC5725}.
-     */
     function allowance(address owner, address spender) public view override(IERC5725) returns (uint256 result) {
         return _allowances[owner][spender];
     }
@@ -140,7 +140,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev Internal function to spend a set allowance
+     * @dev Internal function to set a spendable allowance
      *
      * @param owner The owner of the token
      * @param spender The spender who is permitted to spend the allowance
