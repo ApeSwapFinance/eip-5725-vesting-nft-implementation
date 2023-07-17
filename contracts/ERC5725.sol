@@ -39,7 +39,6 @@ abstract contract ERC5725 is IERC5725, ERC721 {
         uint256 amountClaimed = claimablePayout(tokenId);
         require(amountClaimed > 0, "ERC5725: No pending payout");
 
-        // If the caller is not the owner, spend the allowance
         if (ownerOf(tokenId) != msg.sender) {
             _spendAllowance(ownerOf(tokenId), msg.sender, amountClaimed);
         }
