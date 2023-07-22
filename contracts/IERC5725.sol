@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: CC0-1.0
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /**
@@ -12,19 +12,28 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 interface IERC5725 is IERC721 {
     /**
      *  This event is emitted when the payout is claimed through the claim function.
-     *  @param tokenId The NFT tokenId of the assets being claimed.
+     *  @param tokenId The NFT `tokenId` of the assets being claimed.
      *  @param recipient The address which is receiving the payout.
      *  @param claimAmount The amount of tokens being claimed.
      */
     event PayoutClaimed(uint256 indexed tokenId, address indexed recipient, uint256 claimAmount);
 
     /**
-     *  This event is emitted when an allowance has been increased or decreased.
+     *  This event is emitted when an operator has been approve/unapproved to manage all `tokenId` owned by `owner`.
      *  @param owner The owner of an NFT who's entitled to vested tokens.
-     *  @param spender The address who is given permission to spend vested tokens.
-     *  @param value The updated amount of tokens that have been approved.
+     *  @param operator The address who is given permission to spend vested tokens.
+     *  @param approved The approved status.
      */
-    event ClaimApproval(address owner, address spender, uint256 value);
+    event ClaimApprovalForAll(address indexed owner, address indexed operator, bool approved);
+
+    /**
+     *  This event is emitted when an operator has been approve/unapproved to manage a specific `tokenId` owned by `owner`.
+     *  @param owner The owner of an NFT who's entitled to vested tokens.
+     *  @param operator The address who is given permission to spend vested tokens.
+     *  @param tokenId The NFT `tokenId`.
+     *  @param approved The approved status.
+     */
+    event ClaimApproval(address indexed owner, address indexed operator, uint256 indexed tokenId, bool approved);
 
     /**
      * @notice Claim the pending payout for the NFT.
@@ -37,26 +46,25 @@ interface IERC5725 is IERC721 {
     function claim(uint256 tokenId) external;
 
     /**
-     * @notice Function that allows one account to increase the allowance of another account over their tokens.
-     * @dev MUST revert if spender if the zero address.
-     * MUST emit ClaimApproval.
-     * @param spender The `spender` to be granted an allowance balance.
-     * @param addedValue The allowance granted to `spender`.
+     * @notice Gives permission to `_operatorApprovals` to call `claim` on all `tokenId`s.
+     * @dev `operator`s set in `_operatorApprovals` MAY call `claim` for ALL tokens owned by the caller.
+     * @param operator The account who is given permission to claim vested tokens on behalf of owner.
+     * @param approved The value if `operator` can call `claim` on behalf of owner.
      */
-    function increaseClaimAllowance(address spender, uint256 addedValue) external;
+    function setClaimApprovalForAll(address operator, bool approved) external;
 
     /**
-     * @notice Function that allows one account to decrease the allowance of another account over their tokens.
-     * @dev MUST revert if spender if the zero address.
-     * MUST emit ClaimApproval.
-     * @param spender The `spender` to have allowance balance reduced.
-     * @param subtractedValue The allowance decreased from `spender`.
+     * @notice Gives permission to `tokenIdOperator` to call `claim` on `tokenId`.
+     * @dev `operator` set in `_tokenIdOperator` in MAY call `claim` for `tokenId`.
+     * @param tokenIdOperator The operator of the `tokenId`
+     * @param tokenId The NFT `tokenId`.
+     * @param approved The value if `operator` can call `claim` on behalf of owner.
      */
-    function decreaseClaimAllowance(address spender, uint256 subtractedValue) external;
+    function setClaimApproval(address tokenIdOperator, uint256 tokenId, bool approved) external;
 
     /**
      * @notice Number of tokens for the NFT which have been claimed at the current timestamp.
-     * @param tokenId The NFT token id.
+     * @param tokenId The NFT `tokenId`.
      * @return payout The total amount of payout tokens claimed for this NFT.
      */
     function claimedPayout(uint256 tokenId) external view returns (uint256 payout);
@@ -115,10 +123,17 @@ interface IERC5725 is IERC721 {
     function payoutToken(uint256 tokenId) external view returns (address token);
 
     /**
-     * @notice Returns the allowance that one account has given another over their token.
-     * @param owner Address that tokens are approved from.
-     * @param spender Address that tokens are approved for.
-     * @return result Allowance that one account has given another over their tokens.
+     * @notice Returns the account approved for a `tokenId`.
+     * @param tokenId The NFT token id.
+     * @return operator The account who is given permission to claim vested tokens on behalf of owner.
      */
-    function allowance(address owner, address spender) external view returns (uint256 result);
+    function getClaimApproved(uint256 tokenId) external view returns (address operator);
+
+    /**
+     * @notice Returns true if the `operator` is allowed to manage all of the assets of `owner`.
+     * @param owner The owner of an NFT who's entitled to vested tokens.
+     * @param operator The account who is given permission to claim vested tokens on behalf of owner.
+     * @return isClaimApproved The value if `operator` can call `claim` on behalf of owner.
+     */
+    function isClaimApprovedForAll(address owner, address operator) external view returns (bool isClaimApproved);
 }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -14,8 +14,11 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /// @dev mapping for claimed payouts
     mapping(uint256 => uint256) /*tokenId*/ /*claimed*/ internal _payoutClaimed;
 
-    /// @dev mapping for allowances
-    mapping(address => mapping(address => uint256)) /*address*/ /*(spender, amount)*/ internal _allowances;
+    /// @dev Mapping from token ID to approved tokenId operator
+    mapping(uint256 => address) private _tokenIdApprovals;
+
+    /// @dev Mapping from owner to operator approvals
+    mapping(address => mapping(address => bool)) /* owner */ /*(operator, isApproved)*/ internal _operatorApprovals;
 
     /**
      * @notice Checks if the tokenId exists and its valid
@@ -30,18 +33,10 @@ abstract contract ERC5725 is IERC5725, ERC721 {
      * @dev See {IERC5725}.
      */
     function claim(uint256 tokenId) external override(IERC5725) validToken(tokenId) {
-        require(
-            ownerOf(tokenId) == msg.sender ||
-                (ownerOf(tokenId) != address(0) && allowance(ownerOf(tokenId), msg.sender) > 0),
-            "ERC5725: not owner of NFT or no permission to spend"
-        );
+        require(isApprovedClaimOrOwner(msg.sender, tokenId), "ERC5725: not owner or operator");
 
         uint256 amountClaimed = claimablePayout(tokenId);
         require(amountClaimed > 0, "ERC5725: No pending payout");
-
-        if (ownerOf(tokenId) != msg.sender) {
-            _spendAllowance(ownerOf(tokenId), msg.sender, amountClaimed);
-        }
 
         emit PayoutClaimed(tokenId, msg.sender, amountClaimed);
 
@@ -52,15 +47,21 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function increaseClaimAllowance(address spender, uint256 addedValue) external override(IERC5725) {
-        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] + addedValue);
+    function setClaimApprovalForAll(address operator, bool approved) external override(IERC5725) {
+        _setClaimApprovalForAll(operator, approved);
+        emit ClaimApprovalForAll(msg.sender, operator, approved);
     }
 
     /**
      * @dev See {IERC5725}.
      */
-    function decreaseClaimAllowance(address spender, uint256 subtractedValue) external override(IERC5725) {
-        _setClaimAllowance(msg.sender, spender, _allowances[msg.sender][spender] - subtractedValue);
+    function setClaimApproval(
+        address operator,
+        uint256 tokenId,
+        bool approved
+    ) external override(IERC5725) validToken(tokenId) {
+        _setClaimApproval(operator, tokenId);
+        emit ClaimApproval(msg.sender, operator, tokenId, approved);
     }
 
     /**
@@ -122,15 +123,8 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev See {IERC5725}.
-     */
-    function allowance(address owner, address spender) public view override(IERC5725) returns (uint256 result) {
-        return _allowances[owner][spender];
-    }
-
-    /**
      * @dev See {IERC165-supportsInterface}.
-     * IERC5725 interfaceId = 0xf316c058
+     * IERC5725 interfaceId = 0xd707c82a
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -139,37 +133,70 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev Internal function to set a spendable allowance
+     * @dev Internal function to set the operator status for a given owner to manage all `tokenId`s.
+     * @notice To remove permissions, set approved to false.
      *
-     * @param owner The owner of the token
-     * @param spender The spender who is permitted to spend the allowance
-     * @param value The allowance to be set for spender
-     *
+     * @param operator The address who is given permission to spend vested tokens.
+     * @param approved The approved status.
      */
-    function _setClaimAllowance(address owner, address spender, uint256 value) internal virtual {
-        if (spender == address(0)) {
-            revert("ERC5725: spender cannot be 0 address");
-        }
-        _allowances[owner][spender] = value;
-        emit ClaimApproval(owner, spender, value);
+    function _setClaimApprovalForAll(address operator, bool approved) internal virtual {
+        _operatorApprovals[msg.sender][operator] = approved;
     }
 
     /**
-     * @dev Internal function to spend a set allowance
+     * @dev Internal function to set the operator status for a given tokenId.
+     * @notice To remove permissions, set operator to zero address.
      *
-     * @param owner The owner of the token
-     * @param spender The spender who is claiming the allowance
-     * @param value The allowance to be spent by spender
-     *
+     * @param operator The address who is given permission to spend vested tokens.
+     * @param tokenId The NFT `tokenId`.
      */
-    function _spendAllowance(address owner, address spender, uint256 value) internal virtual {
-        uint256 currentAllowance = allowance(owner, spender);
-        if (currentAllowance != type(uint256).max) {
-            if (currentAllowance < value) {
-                revert("ERC5725: insufficient allowance");
-            }
-            _allowances[owner][spender] = currentAllowance - value;
+    function _setClaimApproval(address operator, uint256 tokenId) internal virtual {
+        require(ownerOf(tokenId) == msg.sender, "ERC5725: not owner of tokenId");
+        _tokenIdApprovals[tokenId] = operator;
+    }
+
+    /**
+     * @dev Internal hook to remove permissions to _tokenIdApprovals[tokenId] when the tokenId is transferred, burnt - but not on mint.
+     *
+     * @param from The address from which the tokens are being transferred.
+     * @param to The address to which the tokens are being transferred.
+     * @param firstTokenId The first tokenId in the batch that is being transferred.
+     * @param batchSize The number of tokens being transferred in this batch.
+     */
+    function _beforeTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal override {
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+        if (from != address(0)) {
+            delete _tokenIdApprovals[firstTokenId];
         }
+    }
+
+    /**
+     * @dev Public view which returns true if the operator has permission to claim for `tokenId`
+     * @notice To remove permissions, set operator to zero address.
+     *
+     * @param operator The address that has permission for a `tokenId`.
+     * @param tokenId The NFT `tokenId`.
+     */
+    function isApprovedClaimOrOwner(address operator, uint256 tokenId) public view virtual returns (bool) {
+        address owner = ownerOf(tokenId);
+        return (operator == owner || isClaimApprovedForAll(owner, operator) || getClaimApproved(tokenId) == operator);
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
+    function getClaimApproved(uint256 tokenId) public view override(IERC5725) returns (address operator) {
+        return _tokenIdApprovals[tokenId];
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
+    function isClaimApprovedForAll(
+        address owner,
+        address operator
+    ) public view override(IERC5725) returns (bool isClaimApproved) {
+        return _operatorApprovals[owner][operator];
     }
 
     /**

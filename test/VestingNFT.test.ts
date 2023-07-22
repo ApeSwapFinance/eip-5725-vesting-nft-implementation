@@ -6,6 +6,8 @@ import { time } from '@nomicfoundation/hardhat-network-helpers'
 import { ERC20Mock, VestingNFT } from '../typechain-types'
 import { IERC5725_InterfaceId } from '../src/erc5725'
 
+const IERC721_InterfaceId = '0x80ac58cd'
+
 const testValues = {
   payout: '1000000000',
   payoutDecimals: 18,
@@ -17,7 +19,8 @@ describe('VestingNFT', function () {
   let vestingNFT: VestingNFT
   let mockToken: ERC20Mock
   let receiverAccount: string
-  let spenderAccount: string
+  let operatorAccount: string
+  let transferToAccount: string
   let unlockTime: number
   let invalidTokenID = 1337
 
@@ -38,7 +41,8 @@ describe('VestingNFT', function () {
 
     accounts = await ethers.getSigners()
     receiverAccount = await accounts[1].getAddress()
-    spenderAccount = await accounts[2].getAddress()
+    operatorAccount = await accounts[2].getAddress()
+    transferToAccount = await accounts[3].getAddress()
     unlockTime = await createVestingNft(
       vestingNFT,
       receiverAccount,
@@ -47,18 +51,19 @@ describe('VestingNFT', function () {
     )
   })
 
+  /**
+   * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified
+   * // Solidity export interface id:
+   * bytes4 public constant IID_ITEST = type(IERC5725).interfaceId;
+   * // Pull out the interfaceId in tests
+   * const interfaceId = await vestingNFT.IID_ITEST();
+   */
   it('Supports ERC721 and IERC5725 interfaces', async function () {
-    // ERC721
-    expect(await vestingNFT.supportsInterface('0x80ac58cd')).to.equal(true)
-
-    /**
-     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified
-     * // Solidity export interface id:
-     * bytes4 public constant IID_ITEST = type(IERC5725).interfaceId;
-     * // Pull out the interfaceId in tests
-     * const interfaceId = await vestingNFT.IID_ITEST();
-     */
-    // Vesting NFT Interface ID
+    // IERC721
+    expect(await vestingNFT.supportsInterface(IERC721_InterfaceId)).to.equal(
+      true
+    )
+    // Vesting NFT Interface IERC5725
     expect(await vestingNFT.supportsInterface(IERC5725_InterfaceId)).to.equal(
       true
     )
@@ -93,10 +98,6 @@ describe('VestingNFT', function () {
     await expect(vestingNFT.claim(invalidTokenID)).to.revertedWith(
       'ERC5725: invalid token ID'
     )
-    // NOTE: Removed claimTo from spec
-    // await expect(vestingNFT.claimTo(1, receiverAccount)).to.revertedWith(
-    //   "ERC5725: invalid token ID"
-    // );
   })
 
   it('Returns a valid pending payout', async function () {
@@ -121,12 +122,14 @@ describe('VestingNFT', function () {
 
   it('Is able to claim', async function () {
     const connectedVestingNft = vestingNFT.connect(accounts[1])
+    expect(await vestingNFT.claimedPayout(0)).to.equal(0)
     await time.increase(testValues.lockTime)
     const txReceipt = await connectedVestingNft.claim(0)
     await txReceipt.wait()
     expect(await mockToken.balanceOf(receiverAccount)).to.equal(
       testValues.payout
     )
+    expect(await vestingNFT.claimedPayout(0)).to.equal(testValues.payout)
   })
 
   it('Reverts claim when payout is 0', async function () {
@@ -139,24 +142,9 @@ describe('VestingNFT', function () {
   it('Reverts claim when payout is not from owner or account with permission', async function () {
     const connectedVestingNft = vestingNFT.connect(accounts[2])
     await expect(connectedVestingNft.claim(0)).to.revertedWith(
-      'ERC5725: not owner of NFT or no permission to spend'
+      'ERC5725: not owner or operator'
     )
   })
-
-  // NOTE: Removed claimTo from spec
-  // it("Is able to claim to other account", async function () {
-  //   const connectedVestingNft = vestingNFT.connect(accounts[1]);
-  //   const otherReceiverAddress = await accounts[2].getAddress();
-  //   await increaseTime(testValues.lockTime);
-  //   const txReceipt = await connectedVestingNft.claimTo(
-  //     0,
-  //     otherReceiverAddress
-  //   );
-  //   await txReceipt.wait();
-  //   expect(await mockToken.balanceOf(otherReceiverAddress)).to.equal(
-  //     testValues.payout
-  //   );
-  // });
 
   it('Reverts when creating to account 0', async function () {
     await expect(
@@ -169,153 +157,164 @@ describe('VestingNFT', function () {
     ).to.revertedWith('to cannot be address 0')
   })
 
-  it('Owner can set a spender with an allowance that can be spent', async function () {
-    // Setup allowance exactly equal to claimable amount
-    const allowanceAmount = testValues.payout
-    const connectedVestingNft = vestingNFT.connect(accounts[1])
-    let increaseAllowanceTx = await connectedVestingNft.increaseClaimAllowance(
-      spenderAccount,
-      allowanceAmount
-    )
-    await increaseAllowanceTx.wait()
-    // Do we have the expected allowance in state?
-    const getCurrentAllowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
-    )
-    expect(getCurrentAllowance.toString()).to.equal(allowanceAmount.toString())
-    await time.increase(testValues.lockTime)
-    // Connect with the spenderAccount and claim our allowance
-    const connectedAllowanceVestingNft = vestingNFT.connect(accounts[2])
-    let claimTx = await connectedAllowanceVestingNft.claim(0)
-    await claimTx.wait()
-    // Do we have allowance 0 since we claimed all of our allowance?
-    const postClaimAllowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
-    )
-    expect(postClaimAllowance.toString()).to.equal((0).toString())
-    // Compare balance after claim, spender now has tokens, owner doesn't
-    const spenderPostClaimBalance = await mockToken.balanceOf(spenderAccount)
-    expect(spenderPostClaimBalance.toString()).to.equal(
-      testValues.payout.toString()
-    )
-    const ownerPostClaimBalance = await mockToken.balanceOf(receiverAccount)
-    expect(ownerPostClaimBalance.toString()).to.equal(BigNumber.from(0))
+  it('Revert when setting an setClaimApproval for a tokenId you do not own', async function () {
+    // Account without permission tries to call setClaimApproval(self,tokenId)
+    const connectedVestingNft = vestingNFT.connect(accounts[2])
+
+    await expect(
+      connectedVestingNft.setClaimApproval(operatorAccount, 1, true)
+    ).to.revertedWith('ERC5725: not owner of tokenId')
   })
 
-  it('Spender cannot overspend allowance', async function () {
-    // Setup allowance to be less than claimable amount
-    const allowanceAmount = Number(testValues.payout) / 2
-    const connectedVestingNft = vestingNFT.connect(accounts[1])
-    let increaseAllowanceTx = await connectedVestingNft.increaseClaimAllowance(
-      spenderAccount,
-      allowanceAmount
+  it("Should allow a designated operator to manage specific tokenId's owned by the owner through _tokenIdApprovals, until such rights are revoked", async function () {
+    // Give permission for SPECIFIC tokenId to be managed
+    const ownersConnectedVestingNft = vestingNFT.connect(accounts[1])
+    const operatorsConnectedVestingNft = vestingNFT.connect(accounts[2])
+    let approveToken1 = ownersConnectedVestingNft.setClaimApproval(
+      operatorAccount,
+      1,
+      true
     )
-    await increaseAllowanceTx.wait()
-    // Do we have the expected allowance in state?
-    const getCurrentAllowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
-    )
-    expect(getCurrentAllowance.toString()).to.equal(allowanceAmount.toString())
+    await expect(approveToken1).to.be.fulfilled
+    await expect(approveToken1)
+      .to.emit(ownersConnectedVestingNft, 'ClaimApproval')
+      .withArgs(receiverAccount, operatorAccount, 1, true)
+
+    // Elapse time, operator can claim
     await time.increase(testValues.lockTime)
-    // Connect with the spenderAccount and since our allowance is less than the vestedPayout, we are unable to claim. Allowance:n-1 Claimable:n
-    const connectedAllowanceVestingNft = vestingNFT.connect(accounts[2])
-    await expect(connectedAllowanceVestingNft.claim(0)).to.be.revertedWith(
-      'ERC5725: insufficient allowance'
+    await expect(operatorsConnectedVestingNft.claim(1)).to.be.fulfilled
+
+    // Owner revokes permission for SPECIFIC tokenId
+    let unapproveToken1 = ownersConnectedVestingNft.setClaimApproval(
+      operatorAccount,
+      1,
+      false
     )
-    // We should still have our original allowance
-    const postClaimAllowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
+    await expect(unapproveToken1).to.be.fulfilled
+    await expect(unapproveToken1)
+      .to.emit(ownersConnectedVestingNft, 'ClaimApproval')
+      .withArgs(receiverAccount, operatorAccount, 1, false)
+
+    // Elapse time, operator can't claim for that specific tokenId because no permissions
+    await time.increase(testValues.lockTime)
+    await expect(operatorsConnectedVestingNft.claim(0)).to.revertedWith(
+      'ERC5725: not owner or operator'
     )
-    expect(postClaimAllowance.toString()).to.equal(allowanceAmount.toString())
   })
 
-  it('Owner can set a spender with an allowance that can be claimed across multiple tokenIds ', async function () {
-    // Set the allowance to twice the payout value
-    const allowanceAmount = Number(testValues.payout) * 2
-    const connectedVestingNft = vestingNFT.connect(accounts[1])
-    let increaseAllowanceTx = await connectedVestingNft.increaseClaimAllowance(
-      spenderAccount,
-      allowanceAmount
-    )
-    await increaseAllowanceTx.wait()
-    // Do we have the expected allowance in state?
-    const getCurrentAllowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
-    )
-    expect(getCurrentAllowance.toString()).to.equal(allowanceAmount.toString())
+  it("Should allow a designated operator to manage all tokenId's owned by the owner through _operatorApprovals, until such rights are revoked", async function () {
+    // Give permission for ALL tokenId to be managed
+    const ownersConnectedVestingNft = vestingNFT.connect(accounts[1])
+    const operatorsConnectedVestingNft = vestingNFT.connect(accounts[2])
+    let approveGlobalOperator =
+      ownersConnectedVestingNft.setClaimApprovalForAll(operatorAccount, true)
+    await expect(approveGlobalOperator).to.be.fulfilled
+    await expect(approveGlobalOperator)
+      .to.emit(ownersConnectedVestingNft, 'ClaimApprovalForAll')
+      .withArgs(receiverAccount, operatorAccount, true)
+
+    // Elapse time, operator can claim
     await time.increase(testValues.lockTime)
-    // Connect with the spenderAccount and claim our allowance
-    const connectedAllowanceVestingNft = vestingNFT.connect(accounts[2])
-    let claimTx1 = await connectedAllowanceVestingNft.claim(0)
-    await claimTx1.wait()
-    // Compare balance after claim, spender now has tokens
-    const spenderPostClaim1Balance = await mockToken.balanceOf(spenderAccount)
-    expect(spenderPostClaim1Balance.toString()).to.equal(
-      testValues.payout.toString()
+    await expect(operatorsConnectedVestingNft.claim(1)).to.be.fulfilled
+    await expect(operatorsConnectedVestingNft.claim(2)).to.be.fulfilled
+    await expect(operatorsConnectedVestingNft.claim(3)).to.be.fulfilled
+
+    // Owner revokes permission for SPECIFIC tokenId
+    let unapproveGlobalOperator =
+      ownersConnectedVestingNft.setClaimApprovalForAll(operatorAccount, false)
+    await expect(unapproveGlobalOperator).to.be.fulfilled
+    await expect(unapproveGlobalOperator)
+      .to.emit(ownersConnectedVestingNft, 'ClaimApprovalForAll')
+      .withArgs(receiverAccount, operatorAccount, false)
+
+    // Elapse time, operator can't claim for that specific tokenId because no permissions
+    await time.increase(testValues.lockTime)
+    await expect(operatorsConnectedVestingNft.claim(1)).to.revertedWith(
+      'ERC5725: not owner or operator'
     )
-    // The allowance should be reduced by the payout
-    let postClaim1Allowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
+    await expect(operatorsConnectedVestingNft.claim(2)).to.revertedWith(
+      'ERC5725: not owner or operator'
     )
-    expect(postClaim1Allowance.toString()).to.equal(
-      testValues.payout.toString()
+    await expect(operatorsConnectedVestingNft.claim(3)).to.revertedWith(
+      'ERC5725: not owner or operator'
     )
-    // Now claim from the second token
-    let claimTx2 = await connectedAllowanceVestingNft.claim(1)
-    await claimTx2.wait()
-    // Check the spender balance, should now be twice the payout
-    const spenderPostClaim2Balance = await mockToken.balanceOf(spenderAccount)
-    expect(spenderPostClaim2Balance.toString()).to.equal(
-      (Number(testValues.payout) * 2).toString()
-    )
-    // The allowance should now be 0 since we claimed all of our allowance
-    let postClaim2Allowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
-    )
-    expect(postClaim2Allowance.toString()).to.equal((0).toString())
   })
 
-  it("Allowances set by an account aren't reset when NFT is transferred", async function () {
-    // Set an allowance for spender
-    const allowanceAmount = testValues.payout
-    const connectedVestingNft = vestingNFT.connect(accounts[1])
-    let increaseAllowanceTx = await connectedVestingNft.increaseClaimAllowance(
-      spenderAccount,
-      allowanceAmount
+  it("Should revoke an operator's management rights from _tokenIdApprovals for a specific tokenId when the token is transferred", async function () {
+    // Give permission for SPECIFIC tokenId to be managed
+    const ownersConnectedVestingNft = vestingNFT.connect(accounts[1])
+    const operatorsConnectedVestingNft = vestingNFT.connect(accounts[2])
+    let approveToken1 = ownersConnectedVestingNft.setClaimApproval(
+      operatorAccount,
+      1,
+      true
     )
-    await increaseAllowanceTx.wait()
+    await expect(approveToken1).to.be.fulfilled
 
-    // Check the allowance is set correctly
-    const getCurrentAllowance = await vestingNFT.allowance(
-      receiverAccount,
-      spenderAccount
+    // permissions added
+    expect(await ownersConnectedVestingNft.getClaimApproved(1)).to.equal(
+      operatorAccount
     )
-    expect(getCurrentAllowance.toString()).to.equal(allowanceAmount.toString())
 
-    // Transfer NFT from receiver to a different account
-    const connectedReceiverVestingNft = vestingNFT.connect(accounts[1])
-    let transferTx = await connectedReceiverVestingNft.transferFrom(
+    // Transfer tokenId 1 to other address which removes the _tokenIdApprovals permission but we keep the global OP status
+    const transferNft = ownersConnectedVestingNft.transferFrom(
       receiverAccount,
-      spenderAccount,
-      0
+      transferToAccount,
+      1
     )
-    await transferTx.wait()
+    await expect(transferNft).to.be.fulfilled
 
-    // Check that the allowance is still the same even though the NFT was transferred
-    const postTransferAllowance = await vestingNFT.allowance(
+    // permissions removed
+    expect(await ownersConnectedVestingNft.getClaimApproved(1)).to.equal(
+      '0x0000000000000000000000000000000000000000'
+    )
+
+    // Operator can't claim for tokenId 1 permissions removed
+    await expect(operatorsConnectedVestingNft.claim(1)).to.revertedWith(
+      'ERC5725: not owner or operator'
+    )
+  })
+
+  it("Should keep an operator's management rights to _operatorApprovals for all tokenIds when one or more are transfered", async function () {
+    // Give permission for ALL tokenId to be managed
+    const ownersConnectedVestingNft = vestingNFT.connect(accounts[1])
+    const operatorsConnectedVestingNft = vestingNFT.connect(accounts[2])
+    let approveGlobalOperator =
+      ownersConnectedVestingNft.setClaimApprovalForAll(operatorAccount, true)
+    await expect(approveGlobalOperator).to.be.fulfilled
+
+    // permissions added
+    expect(
+      await ownersConnectedVestingNft.isClaimApprovedForAll(
+        receiverAccount,
+        operatorAccount
+      )
+    ).to.equal(true)
+
+    // Transfer tokenId 1 to other address which removes the _tokenIdApprovals permission but we keep the global OP status
+    const transferNft = ownersConnectedVestingNft.transferFrom(
       receiverAccount,
-      spenderAccount
+      transferToAccount,
+      1
     )
-    expect(postTransferAllowance.toString()).to.equal(
-      allowanceAmount.toString()
+    await expect(transferNft).to.be.fulfilled
+
+    // permissions kept
+    expect(
+      await ownersConnectedVestingNft.isClaimApprovedForAll(
+        receiverAccount,
+        operatorAccount
+      )
+    ).to.equal(true)
+
+    // Operator can't claim for tokenId 1 they don't own it anymore
+    await expect(operatorsConnectedVestingNft.claim(1)).to.revertedWith(
+      'ERC5725: not owner or operator'
     )
+    // Operator can claim for other tokenIds
+    await time.increase(testValues.lockTime)
+    await expect(operatorsConnectedVestingNft.claim(2)).to.be.fulfilled
+    await expect(operatorsConnectedVestingNft.claim(3)).to.be.fulfilled
   })
 })
 
