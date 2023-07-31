@@ -41,11 +41,11 @@ These curves could represent:
     - There are many such contracts in the wild and most of them differ in both interface and implementation.
 4. NFT marketplaces dedicated to vesting NFTs.
     - Whole new sets of interfaces and analytics could be created from a common standard for token vesting NFTs.
-5. Integrating vesting NFTs into services like Gnosis Safe.
-    - A standard would mean services like Gnosis Safe could more easily and uniformly support interactions with these types of contracts inside of a multisig contract.
+5. Integrating vesting NFTs into services like Safe Wallet.
+    - A standard would mean services like Safe Wallet could more easily and uniformly support interactions with these types of contracts inside of a multisig contract.
 6. Enable standardized fundraising implementations and general fundraising that sell vesting tokens (eg. SAFTs) in a more transparent manner.
 7. Allows tools, front-end apps, aggregators, etc. to show a more holistic view of the vesting tokens and the properties available to users.
-    - Currently, every project needs to write their own visualization of the vesting schedule of their vesting assets. If this is standardized, third-party tools could be developed aggregate all vesting NFTs from all projects for the user, display their schedules and allow the user to take aggregated vesting actions.
+    - Currently, every project needs to write their own visualization of the vesting schedule of their vesting assets. If this is standardized, third-party tools could be developed to aggregate all vesting NFTs from all projects for the user, display their schedules and allow the user to take aggregated vesting actions.
     - Such tooling can easily discover compliance through the [EIP-165](./eip-165.md) `supportsInterface(InterfaceID)` check.
 8. Makes it easier for a single wrapping implementation to be used across all vesting standards that defines multiple recipients, periodic renting of vesting tokens etc.
 
@@ -202,7 +202,7 @@ These feature are not supported by the standard as is, but the standard could be
 
 - **Custom Vesting Curves**: This standard intends on returning deterministic `vesting` values given NFT `tokenId` and a **timestamp** as inputs. This is intentional as it provides for flexibility in how the vesting curves work under the hood which doesn't constrain projects who intend on building a complex smart contract vesting architecture.
 - **Beneficiary**: This standard could be extended to provide for a `beneficiary` address who may `claim` unlocked tokens.
-- **NFT Rentals**: Further complex DeFi tool can be created if vesting NFTs could be rented. 
+- **NFT Rentals**: Further complex DeFi tools can be created if vesting NFTs could be rented. 
 
 This is done intentionally to keep the base standard simple. These features can and likely will be added through extensions of this standard.
 
