@@ -133,6 +133,35 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
+     * @dev See {IERC5725}.
+     */
+    function getClaimApproved(uint256 tokenId) public view override(IERC5725) returns (address operator) {
+        return _tokenIdApprovals[tokenId];
+    }
+
+    /**
+     * @dev See {IERC5725}.
+     */
+    function isClaimApprovedForAll(
+        address owner,
+        address operator
+    ) public view override(IERC5725) returns (bool isClaimApproved) {
+        return _operatorApprovals[owner][operator];
+    }
+
+    /**
+     * @dev Public view which returns true if the operator has permission to claim for `tokenId`
+     * @notice To remove permissions, set operator to zero address.
+     *
+     * @param operator The address that has permission for a `tokenId`.
+     * @param tokenId The NFT `tokenId`.
+     */
+    function isApprovedClaimOrOwner(address operator, uint256 tokenId) public view virtual returns (bool) {
+        address owner = ownerOf(tokenId);
+        return (operator == owner || isClaimApprovedForAll(owner, operator) || getClaimApproved(tokenId) == operator);
+    }
+
+    /**
      * @dev Internal function to set the operator status for a given owner to manage all `tokenId`s.
      * @notice To remove permissions, set approved to false.
      *
@@ -156,7 +185,8 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev Internal hook to remove permissions to _tokenIdApprovals[tokenId] when the tokenId is transferred, burnt - but not on mint.
+     * @dev Internal hook to remove permissions to _tokenIdApprovals[tokenId]
+     *      Removes permissions when the tokenId is transferred, burnt, but not on mint.
      *
      * @param from The address from which the tokens are being transferred.
      * @param to The address to which the tokens are being transferred.
@@ -168,35 +198,6 @@ abstract contract ERC5725 is IERC5725, ERC721 {
         if (from != address(0)) {
             delete _tokenIdApprovals[firstTokenId];
         }
-    }
-
-    /**
-     * @dev Public view which returns true if the operator has permission to claim for `tokenId`
-     * @notice To remove permissions, set operator to zero address.
-     *
-     * @param operator The address that has permission for a `tokenId`.
-     * @param tokenId The NFT `tokenId`.
-     */
-    function isApprovedClaimOrOwner(address operator, uint256 tokenId) public view virtual returns (bool) {
-        address owner = ownerOf(tokenId);
-        return (operator == owner || isClaimApprovedForAll(owner, operator) || getClaimApproved(tokenId) == operator);
-    }
-
-    /**
-     * @dev See {IERC5725}.
-     */
-    function getClaimApproved(uint256 tokenId) public view override(IERC5725) returns (address operator) {
-        return _tokenIdApprovals[tokenId];
-    }
-
-    /**
-     * @dev See {IERC5725}.
-     */
-    function isClaimApprovedForAll(
-        address owner,
-        address operator
-    ) public view override(IERC5725) returns (bool isClaimApproved) {
-        return _operatorApprovals[owner][operator];
     }
 
     /**

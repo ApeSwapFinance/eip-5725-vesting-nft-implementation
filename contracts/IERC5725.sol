@@ -20,7 +20,7 @@ interface IERC5725 is IERC721 {
 
     /**
      * @notice Claim the pending payout for the NFT
-     * @dev MUST grant the claimablePayout value at the time of claim being called to msg.sender
+     * @dev MUST grant the claimablePayout value at the time of claim being called to `msg.sender`
      * MUST revert if not called by the token owner or approved users
      * MUST emit PayoutClaimed
      * SHOULD revert if there is nothing to claim
