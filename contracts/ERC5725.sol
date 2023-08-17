@@ -45,7 +45,9 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev See {IERC5725}.
+     * @dev Sets a global `operator` with permission to manage all tokens owned by the current `msg.sender`.
+     * @param operator The address to let manage all tokens.
+     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
      */
     function setClaimApprovalForAll(address operator, bool approved) external {
         _setClaimApprovalForAll(operator, approved);
@@ -53,7 +55,10 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev See {IERC5725}.
+     * @dev Sets a tokenId `operator` with permission to manage a single `tokenId` owned by the `msg.sender`.
+     * @param operator The address to let manage a single `tokenId`.
+     * @param tokenId the `tokenId` to be managed.
+     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
      */
     function setClaimApproval(address operator, uint256 tokenId, bool approved) external validToken(tokenId) {
         _setClaimApproval(operator, tokenId);
@@ -120,7 +125,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
 
     /**
      * @dev See {IERC165-supportsInterface}.
-     * IERC5725 interfaceId = 0xd707c82a
+     * IERC5725 interfaceId = 0x7c89676d
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -129,14 +134,17 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev See {IERC5725}.
+     * @dev Returns the operating address for a `tokenId`. If `tokenId` is not managed, then returns the zero address.
+     * @param tokenId The NFT `tokenId` to query for a `tokenId` manager.
      */
     function getClaimApproved(uint256 tokenId) public view returns (address operator) {
         return _tokenIdApprovals[tokenId];
     }
 
     /**
-     * @dev See {IERC5725}.
+     * @dev Returns true if `owner` has set `operator` to manage all `tokenId`s.
+     * @param owner The owner allowing `operator` to manage all `tokenId`s.
+     * @param operator The address who is given permission to spend tokens on behalf of the `owner`.
      */
     function isClaimApprovedForAll(address owner, address operator) public view returns (bool isClaimApproved) {
         return _operatorApprovals[owner][operator];
@@ -178,8 +186,8 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev Internal hook to remove permissions to _tokenIdApprovals[tokenId]
-     *      Removes permissions when the tokenId is transferred, burnt, but not on mint.
+     * @dev Internal function to hook into {IERC721-_afterTokenTransfer}, when a token is being transferred.
+     * Removes permissions to _tokenIdApprovals[tokenId] when the tokenId is transferred, burnt, but not on mint.
      *
      * @param from The address from which the tokens are being transferred.
      * @param to The address to which the tokens are being transferred.
