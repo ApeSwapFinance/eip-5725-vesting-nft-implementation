@@ -3,7 +3,7 @@ import ERC5725_Artifact from '../artifacts/contracts/ERC5725.sol/ERC5725.json'
 import { ERC5725 } from '../typechain-types'
 
 // This constant represents the interface ID of the IERC5725 contract.
-export const IERC5725_InterfaceId = '0xd707c82a'
+export const IERC5725_InterfaceId = '0x7c89676d'
 
 /**
  * This function returns an instance of the ERC5725 contract, which is a smart contract that implements the IERC5725 interface.

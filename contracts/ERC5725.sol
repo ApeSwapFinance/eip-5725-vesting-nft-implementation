@@ -47,7 +47,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function setClaimApprovalForAll(address operator, bool approved) external override(IERC5725) {
+    function setClaimApprovalForAll(address operator, bool approved) external {
         _setClaimApprovalForAll(operator, approved);
         emit ClaimApprovalForAll(msg.sender, operator, approved);
     }
@@ -55,11 +55,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function setClaimApproval(
-        address operator,
-        uint256 tokenId,
-        bool approved
-    ) external override(IERC5725) validToken(tokenId) {
+    function setClaimApproval(address operator, uint256 tokenId, bool approved) external validToken(tokenId) {
         _setClaimApproval(operator, tokenId);
         emit ClaimApproval(msg.sender, operator, tokenId, approved);
     }
@@ -135,17 +131,14 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     /**
      * @dev See {IERC5725}.
      */
-    function getClaimApproved(uint256 tokenId) public view override(IERC5725) returns (address operator) {
+    function getClaimApproved(uint256 tokenId) public view returns (address operator) {
         return _tokenIdApprovals[tokenId];
     }
 
     /**
      * @dev See {IERC5725}.
      */
-    function isClaimApprovedForAll(
-        address owner,
-        address operator
-    ) public view override(IERC5725) returns (bool isClaimApproved) {
+    function isClaimApprovedForAll(address owner, address operator) public view returns (bool isClaimApproved) {
         return _operatorApprovals[owner][operator];
     }
 
