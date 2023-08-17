@@ -54,9 +54,9 @@ describe('VestingNFT', function () {
   /**
    * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified
    * // Solidity export interface id:
-   * bytes4 public constant IID_ITEST = type(IERC5725).interfaceId;
+   * bytes4 public constant IID_TEST = type(IERC5725).interfaceId;
    * // Pull out the interfaceId in tests
-   * const interfaceId = await vestingNFT.IID_ITEST();
+   * const interfaceId = await vestingNFT.IID_TEST();
    */
   it('Supports ERC721 and IERC5725 interfaces', async function () {
     // IERC721
@@ -162,7 +162,7 @@ describe('VestingNFT', function () {
     const connectedVestingNft = vestingNFT.connect(accounts[2])
 
     await expect(
-      connectedVestingNft.setClaimApproval(operatorAccount, 1, true)
+      connectedVestingNft.setClaimApproval(operatorAccount, true, 1)
     ).to.revertedWith('ERC5725: not owner of tokenId')
   })
 
@@ -172,8 +172,8 @@ describe('VestingNFT', function () {
     const operatorsConnectedVestingNft = vestingNFT.connect(accounts[2])
     let approveToken1 = ownersConnectedVestingNft.setClaimApproval(
       operatorAccount,
-      1,
-      true
+      true,
+      1
     )
     await expect(approveToken1).to.be.fulfilled
     await expect(approveToken1)
@@ -185,13 +185,13 @@ describe('VestingNFT', function () {
     await expect(operatorsConnectedVestingNft.claim(1)).to.be.fulfilled
 
     // Owner revokes permission for SPECIFIC tokenId
-    let unapproveToken1 = ownersConnectedVestingNft.setClaimApproval(
+    let unapprovedToken1 = ownersConnectedVestingNft.setClaimApproval(
       operatorAccount,
-      1,
-      false
+      false,
+      1
     )
-    await expect(unapproveToken1).to.be.fulfilled
-    await expect(unapproveToken1)
+    await expect(unapprovedToken1).to.be.fulfilled
+    await expect(unapprovedToken1)
       .to.emit(ownersConnectedVestingNft, 'ClaimApproval')
       .withArgs(receiverAccount, operatorAccount, 1, false)
 
@@ -220,10 +220,10 @@ describe('VestingNFT', function () {
     await expect(operatorsConnectedVestingNft.claim(3)).to.be.fulfilled
 
     // Owner revokes permission for SPECIFIC tokenId
-    let unapproveGlobalOperator =
+    let unapprovedGlobalOperator =
       ownersConnectedVestingNft.setClaimApprovalForAll(operatorAccount, false)
-    await expect(unapproveGlobalOperator).to.be.fulfilled
-    await expect(unapproveGlobalOperator)
+    await expect(unapprovedGlobalOperator).to.be.fulfilled
+    await expect(unapprovedGlobalOperator)
       .to.emit(ownersConnectedVestingNft, 'ClaimApprovalForAll')
       .withArgs(receiverAccount, operatorAccount, false)
 
@@ -246,8 +246,8 @@ describe('VestingNFT', function () {
     const operatorsConnectedVestingNft = vestingNFT.connect(accounts[2])
     let approveToken1 = ownersConnectedVestingNft.setClaimApproval(
       operatorAccount,
-      1,
-      true
+      true,
+      1
     )
     await expect(approveToken1).to.be.fulfilled
 

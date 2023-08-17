@@ -45,22 +45,21 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev Sets a global `operator` with permission to manage all tokens owned by the current `msg.sender`.
-     * @param operator The address to let manage all tokens.
-     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
+     * @dev See {IERC5725}.
      */
-    function setClaimApprovalForAll(address operator, bool approved) external {
+    function setClaimApprovalForAll(address operator, bool approved) external override(IERC5725) {
         _setClaimApprovalForAll(operator, approved);
         emit ClaimApprovalForAll(msg.sender, operator, approved);
     }
 
     /**
-     * @dev Sets a tokenId `operator` with permission to manage a single `tokenId` owned by the `msg.sender`.
-     * @param operator The address to let manage a single `tokenId`.
-     * @param tokenId the `tokenId` to be managed.
-     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
+     * @dev See {IERC5725}.
      */
-    function setClaimApproval(address operator, uint256 tokenId, bool approved) external validToken(tokenId) {
+    function setClaimApproval(
+        address operator,
+        bool approved,
+        uint256 tokenId
+    ) external override(IERC5725) validToken(tokenId) {
         _setClaimApproval(operator, tokenId);
         emit ClaimApproval(msg.sender, operator, tokenId, approved);
     }
@@ -125,7 +124,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
 
     /**
      * @dev See {IERC165-supportsInterface}.
-     * IERC5725 interfaceId = 0x7c89676d
+     * IERC5725 interfaceId = 0xbd3a202b
      */
     function supportsInterface(
         bytes4 interfaceId
@@ -134,8 +133,7 @@ abstract contract ERC5725 is IERC5725, ERC721 {
     }
 
     /**
-     * @dev Returns the operating address for a `tokenId`. If `tokenId` is not managed, then returns the zero address.
-     * @param tokenId The NFT `tokenId` to query for a `tokenId` manager.
+     * @dev See {IERC5725}.
      */
     function getClaimApproved(uint256 tokenId) public view returns (address operator) {
         return _tokenIdApprovals[tokenId];
