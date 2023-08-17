@@ -1,6 +1,6 @@
 {
   "name": "@ape.swap/erc-5725",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
   "main": "dist/src/index.js",
   "files": [
