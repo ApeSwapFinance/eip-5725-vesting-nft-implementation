@@ -17,7 +17,7 @@ export const NETWORKS = <const>[
   'hardhat',
 ]
 // Create a type out of the network array
-export type Network = typeof NETWORKS[number]
+export type Network = (typeof NETWORKS)[number]
 
 export type TaskRunOptions = {
   force?: boolean

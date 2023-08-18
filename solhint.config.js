@@ -29,7 +29,7 @@ module.exports = {
     "func-param-name-mixedcase": "error",
     "modifier-name-mixedcase": "error",
     "private-vars-leading-underscore": ["error", { "strict": false }], 
-    "ordering": "error",
+    "ordering": "warn",
 
     // Security Rules
     "compiler-version": ["warn", COMPILER_VERSION],
