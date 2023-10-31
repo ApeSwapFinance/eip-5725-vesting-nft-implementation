@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GPL-3.0
+// SPDX-License-Identifier: CC0-1.0
 pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
@@ -45,21 +45,6 @@ interface IERC5725 is IERC721 {
      * @param tokenId The NFT token id.
      */
     function claim(uint256 tokenId) external;
-
-    /**
-     * @notice Sets a global `operator` with permission to manage all tokens owned by the current `msg.sender`.
-     * @param operator The address to let manage all tokens.
-     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
-     */
-    function setClaimApprovalForAll(address operator, bool approved) external;
-
-    /**
-     * @notice Sets a tokenId `operator` with permission to manage a single `tokenId` owned by the `msg.sender`.
-     * @param operator The address to let manage a single `tokenId`.
-     * @param tokenId the `tokenId` to be managed.
-     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
-     */
-    function setClaimApproval(address operator, bool approved, uint256 tokenId) external;
 
     /**
      * @notice Number of tokens for the NFT which have been claimed at the current timestamp.
@@ -120,6 +105,21 @@ interface IERC5725 is IERC721 {
      * @return token The token which is used to pay out the vesting claims.
      */
     function payoutToken(uint256 tokenId) external view returns (address token);
+
+    /**
+     * @notice Sets a global `operator` with permission to manage all tokens owned by the current `msg.sender`.
+     * @param operator The address to let manage all tokens.
+     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
+     */
+    function setClaimApprovalForAll(address operator, bool approved) external;
+
+    /**
+     * @notice Sets a tokenId `operator` with permission to manage a single `tokenId` owned by the `msg.sender`.
+     * @param operator The address to let manage a single `tokenId`.
+     * @param tokenId the `tokenId` to be managed.
+     * @param approved A boolean indicating whether the spender is approved to claim for all tokens.
+     */
+    function setClaimApproval(address operator, bool approved, uint256 tokenId) external;
 
     /**
      * @notice Returns true if `owner` has set `operator` to manage all `tokenId`s.
