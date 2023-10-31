@@ -1,6 +1,6 @@
 {
   "name": "@ape.swap/erc-5725",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ERC-5725: Transferrable Vesting NFT - Reference Implementation.",
   "main": "dist/src/index.js",
   "files": [
