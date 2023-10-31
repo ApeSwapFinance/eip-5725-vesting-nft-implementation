@@ -1,7 +1,7 @@
 {
   "name": "@ape.swap/erc-5725",
-  "version": "0.0.12",
-  "description": "Solidity Smart Contract development template using modern Web3 frameworks/tools including Hardhat, Typechain and more.",
+  "version": "1.0.0",
+  "description": "ERC-5725: Transferrable Vesting NFT - Reference Implementation.",
   "main": "dist/src/index.js",
   "files": [
     "README.md",

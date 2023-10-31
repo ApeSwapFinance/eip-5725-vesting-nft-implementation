@@ -1,4 +1,4 @@
-# EIP-5725: Transferrable Vesting NFT - Reference Implementation
+# ERC-5725: Transferrable Vesting NFT - Reference Implementation
 [![lint & test](https://github.com/ApeSwapFinance/eip-5725-vesting-nft-implementation/actions/workflows/lint-test.yml/badge.svg)](https://github.com/ApeSwapFinance/eip-5725-vesting-nft-implementation/actions/workflows/lint-test.yml)
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
 [![License](https://img.shields.io/badge/License-GPLv3-green.svg)](https://www.gnu.org/licenses/gpl-3.0)
