@@ -1,3 +1,5 @@
+# ⚠️ ARCHIVED ⚠️ This repo is now being maintained in the official [ERC-5725 org](https://github.com/ERC-5725/ERC-5725-reference)
+
 # ERC-5725: Transferrable Vesting NFT - Reference Implementation
 [![lint & test](https://github.com/ApeSwapFinance/eip-5725-vesting-nft-implementation/actions/workflows/lint-test.yml/badge.svg)](https://github.com/ApeSwapFinance/eip-5725-vesting-nft-implementation/actions/workflows/lint-test.yml)
 [![Docs](https://img.shields.io/badge/docs-%F0%9F%93%84-yellow)](./docs/)
